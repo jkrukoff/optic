@@ -1,0 +1,10 @@
+---
+version: "3"
+
+services:
+
+  test:
+    build:
+      context: .
+    container_name: partial
+    command: test-unit

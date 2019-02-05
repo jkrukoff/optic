@@ -1,0 +1,26 @@
+*.beam
+*.o
+*.plt
+.erlang.cookie
+.idea
+_build
+ebin
+erl_crash.dump
+log
+logs
+rebar3.crashdump
+.rebar3
+
+# CI secrets.
+codeship.aes
+deploy/dockercfg.json
+deploy/env.env
+config/test.config
+
+# Optional python dependencies.
+.virtualenv
+
+# Vim files.
+*.swo
+*.swp
+tags

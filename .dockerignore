@@ -1,0 +1,21 @@
+# Docker build instructions.
+Dockerfile
+.dockerignore
+
+# Revision control.
+.git/
+**/.gitignore
+
+# Vim files.
+tags
+**/*.sw[po]
+
+# Build tools in base image.
+./rebar3
+
+# Local build artifacts.
+./_build
+.virtualenv
+log
+logs
+test/.rebar3
