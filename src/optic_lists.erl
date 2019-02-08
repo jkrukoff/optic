@@ -1,127 +1,118 @@
 %%%-------------------------------------------------------------------
 %%% @doc
-%%%
+%%% A set of optics specific to lists.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(optic_lists).
 
 %% API
 -export([all/0,
-         all_opt/0,
+         all/1,
          head/0,
-         head_opt/0,
-         head_opt/1,
+         head/1,
          tail/0,
-         tail_opt/0,
-         tail_opt/1,
+         tail/1,
          nth/1,
-         nth_opt/1,
-         nth_opt/2]).
+         nth/2]).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
+-spec all() -> optic:optic().
 all() ->
-    Get = fun (List) when is_list(List) ->
-        {ok, List};
-    (_) ->
-        {error, undefined}
-    end,
-    Put = fun (List, Value) when length(List) == length(Value) ->
-        {ok, Value};
-    (_, _) ->
-        {error, undefined}
-    end,
-    Del = fun (List) when is_list(List) ->
-        {ok, []};
-    (_) ->
-        {error, undefined}
-    end,
-    optic:new(Get, Put, undefined, Del).
+    all(#{}).
 
-all_opt() ->
-    New = fun () -> [] end,
-    optic:from(all(), #{new=>New}).
+-spec all(optic:extend_options()) -> optic:optic().
+all(Options) ->
+    Fold = fun (Fun, Acc, List) when is_list(List) ->
+        {ok, lists:foldl(Fun, Acc, List)};
+    (_, _, _) ->
+        {error, undefined}
+    end,
+    MapFold = fun (Fun, Acc, List) when is_list(List) ->
+        {ok, lists:mapfoldl(Fun, Acc, List)};
+    (_, _, _) ->
+        {error, undefined}
+    end,
+    New = fun (_Data, _Template) ->
+        []
+    end,
+    Optic = optic:new(Fold, MapFold),
+    optic:'%extend'(Optic, Options, New).
 
+-spec head() -> optic:optic().
 head() ->
-    Get = fun ([Head | _]) ->
-        {ok, [Head]};
-    (_) ->
+    head(#{}).
+
+-spec head(optic:extend_options()) -> optic:optic().
+head(Options) ->
+    Fold = fun (Fun, Acc, [Head | _]) ->
+        {ok, Fun(Head, Acc)};
+    (_, _, _) ->
         {error, undefined}
     end,
-    Put = fun ([_ | Tail], [Head]) ->
-        {ok, [Head | Tail]};
-    (_, _) ->
+    MapFold = fun (Fun, Acc, [Head | Tail]) ->
+        {NewHead, NewAcc} = Fun(Head, Acc),
+        {ok, {[NewHead | Tail], NewAcc}};
+    (_, _, _) ->
         {error, undefined}
     end,
-    Del = fun ([_ | Tail]) ->
-        {ok, Tail};
-    (_) ->
-        {error, undefined}
+    New = fun (_Data, Template) ->
+        [Template]
     end,
-    optic:new(Get, Put, undefined, Del).
+    Optic = optic:new(Fold, MapFold),
+    optic:'%extend'(Optic, Options, New).
 
-head_opt() ->
-    head_opt(undefined).
-
-head_opt(NewValue) ->
-    New = fun () -> [NewValue] end,
-    optic:from(head(), #{new=>New}).
-
+-spec tail() -> optic:optic().
 tail() ->
-    Get = fun ([_ | Tail]) ->
-        {ok, [Tail]};
-    (_) ->
+    tail(#{}).
+
+-spec tail(optic:extend_options()) -> optic:optic().
+tail(Options) ->
+    Fold = fun (Fun, Acc, [_ | Tail]) ->
+        {ok, lists:foldl(Fun, Acc, Tail)};
+    (_, _, _) ->
         {error, undefined}
     end,
-    Put = fun ([Head | _], [Tail]) when is_list(Tail) ->
-        {ok, [Head | Tail]};
-    (_, _) ->
+    MapFold = fun (Fun, Acc, [Head | Tail]) ->
+        {NewTail, NewAcc} = lists:mapfoldl(Fun, Acc, Tail),
+        {ok, {[Head | NewTail], NewAcc}};
+    (_, _, _) ->
         {error, undefined}
     end,
-    Del = fun ([Head | _]) ->
-        {ok, [Head]};
-    (_) ->
-        {error, undefined}
+    New = fun (_Data, Template) ->
+        [Template]
     end,
-    optic:new(Get, Put, undefined, Del).
+    Optic = optic:new(Fold, MapFold),
+    optic:'%extend'(Optic, Options, New).
 
-tail_opt() ->
-    tail_opt(undefined).
-
-tail_opt(NewValue) ->
-    New = fun () -> [NewValue] end,
-    optic:from(tail(), #{new=>New}).
-
+-spec nth(pos_integer()) -> optic:optic().
 nth(N) ->
-    Get = fun (List) when N =< length(List) ->
-        {ok, [lists:nth(N, List)]};
-    (_) ->
-        {error, undefined}
-    end,
-    Put = fun (List, [Value]) when N =< length(List) ->
-        {Before, [_ | Tail]} = lists:split(N, List),
-        {ok, Before ++ [Value] ++ Tail};
-    (_, _) ->
-        {error, undefined}
-    end,
-    Del = fun (List) when N =< length(List) ->
-        {Before, [_ | Tail]} = lists:split(N, List),
-        {ok, Before ++ Tail};
-    (_) ->
-        {error, undefined}
-    end,
-    optic:new(Get, Put, undefined, Del).
+    nth(N, #{}).
 
-nth_opt(N) ->
-    nth_opt(N, undefined).
-
-nth_opt(N, NewValue) ->
-    New = fun () ->
-        lists:duplicate(N, NewValue)
+-spec nth(pos_integer(), optic:extend_options()) -> optic:optic().
+nth(N, Options) ->
+    Fold = fun (Fun, Acc, List) when N =< length(List) ->
+        Nth = lists:nth(N, List),
+        {ok, Fun(Nth, Acc)};
+    (_, _, _) ->
+        {error, undefined}
     end,
-    optic:from(nth(N), #{new=>New}).
+    MapFold = fun (Fun, Acc, List) when N =< length(List) ->
+        {Before, [Head | Tail]} = lists:split(N - 1, List),
+        {NewHead, NewAcc} = Fun(Head, Acc),
+        {ok, {Before ++ [NewHead] ++ Tail, NewAcc}};
+    (_, _, _) ->
+        {error, undefined}
+    end,
+    New = fun (Data, Template) when is_list(Data) ->
+        Data ++ lists:duplicate(N - length(Data), Template);
+    (_Data, Template) ->
+        lists:duplicate(N, Template)
+    end,
+    Optic = optic:new(Fold, MapFold),
+    optic:'%extend'(Optic, Options, New).
 
 %%%===================================================================
 %%% Internal Functions
