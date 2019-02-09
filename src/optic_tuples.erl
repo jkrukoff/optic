@@ -37,7 +37,7 @@ all(Options) ->
     New = fun (_Data, _Template) ->
         {}
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec element(pos_integer()) -> optic:optic().
@@ -65,7 +65,7 @@ element(N, Options) ->
     (_Data, Template) ->
         list_to_tuple(lists:duplicate(N, Template))
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec field(atom(), pos_integer(), pos_integer()) -> optic:optic().
@@ -96,5 +96,5 @@ field(Tag, Size, N, Options) ->
     New = fun (_Data, Template) ->
         list_to_tuple([Tag] ++ lists:duplicate(Size - 1, Template))
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).

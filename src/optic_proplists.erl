@@ -60,7 +60,7 @@ keys(Options) ->
     New = fun (_Data, _Template) ->
         []
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec values() -> optic:optic().
@@ -92,7 +92,7 @@ values(Options) ->
     New = fun (_Data, _Template) ->
         []
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec properties() -> optic:optic().
@@ -120,7 +120,7 @@ properties(Options) ->
     New = fun (_Data, _Template) ->
         []
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec key(term()) -> optic:optic().
@@ -169,7 +169,7 @@ key(Key, Options) ->
     (_Data, Template) ->
         [{Key, Template}]
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec property(term()) -> optic:optic().
@@ -218,5 +218,5 @@ property(Key, Options) ->
     (_Data, Template) ->
         [{Key, Template}]
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).

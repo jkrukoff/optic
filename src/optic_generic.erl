@@ -108,7 +108,7 @@ key(Key) ->
                 {ok, {Unknown, Acc}}
         end
     end,
-    optic:new(Fold, MapFold).
+    optic:new(MapFold, Fold).
 
 -spec index(non_neg_integer()) -> optic:optic().
 index(Index) ->
@@ -132,7 +132,7 @@ index(Index) ->
     (_Fun, Acc, Unknown) ->
         {ok, {Unknown, Acc}}
     end,
-    optic:new(Fold, MapFold).
+    optic:new(MapFold, Fold).
 
 %%%===================================================================
 %%% Internal Functions

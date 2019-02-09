@@ -38,7 +38,7 @@ all(Options) ->
     New = fun (_Data, _Template) ->
         []
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec head() -> optic:optic().
@@ -61,7 +61,7 @@ head(Options) ->
     New = fun (_Data, Template) ->
         [Template]
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec tail() -> optic:optic().
@@ -84,7 +84,7 @@ tail(Options) ->
     New = fun (_Data, Template) ->
         [Template]
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
 -spec nth(pos_integer()) -> optic:optic().
@@ -111,5 +111,5 @@ nth(N, Options) ->
     (_Data, Template) ->
         lists:duplicate(N, Template)
     end,
-    Optic = optic:new(Fold, MapFold),
+    Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).

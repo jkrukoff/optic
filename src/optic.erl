@@ -5,7 +5,8 @@
 %%%-------------------------------------------------------------------
 -module(optic).
 
--record(optic, {fold, mapfold}).
+-record(optic, {fold :: optic_fold() | undefined,
+                mapfold :: optic_mapfold() | undefined}).
 
 -type error() :: {error, atom()}.
 -type option(Success) :: {ok, Success} | error().
@@ -24,7 +25,8 @@
 -opaque optics() :: [optic()].
 
 %% API
--export([new/2,
+-export([new/1,
+         new/2,
          from/1,
          '%extend'/3,
          fold/4,
@@ -46,16 +48,96 @@
 %%% API
 %%%===================================================================
 
--spec new(optic_fold(), optic_mapfold()) -> optic().
-new(Fold, MapFold) ->
+%% @doc
+%% Create a new optic for traversing a data structure.
+%%
+%% This is the less efficient form of optic construction and will
+%% infer a fold function from the given mapfold function.
+%% @end
+%% @see new/2
+-spec new(optic_mapfold() | undefined) -> optic().
+new(MapFold) ->
+    Fold = fun (Fun, Acc, Data) ->
+        case MapFold(fun (Elem, InnerAcc) ->
+                         {Elem, Fun(Elem, InnerAcc)}
+                     end,
+                     Acc,
+                     Data) of
+            {ok, {_, NewAcc}} ->
+                {ok, NewAcc};
+            {error, _} = Error ->
+                Error
+        end
+    end,
+    new(MapFold, Fold).
+
+%% @doc
+%% Create a new optic for traversing a data structure.
+%%
+%% At a minimum, an optic requires a mapfold function to be provided
+%% for both collecting and modifying values. This function must take
+%% three arguments; a callback function, an initial accumulator value
+%% and an arbitrary structure to traverse. The callback function will
+%% expect two values; an element and the current accumulator. It will
+%% return a two item tuple with the modified element and the modified
+%% accumulator. The mapfold function will return a two item tuple with
+%% the modified structure and the final accumulator value, wrapped in
+%% an ok or error tagged tuple.
+%%
+%% A fold function can also be provided for more efficient traversal
+%% without modification. If one is not provided, it will be
+%% inefficiently inferred from the mapfold function. This function
+%% must take three arguments; a callback function, an initial
+%% accumulator value and an arbitrary structure to traverse. The
+%% callback function will expect two values; an element and the
+%% current accumulator. It will return the modified accumulator. The
+%% fold function will return a final accumulator value, wrapped in an
+%% ok or error tagged tuple.
+%%
+%% To compose optics without unexpected side effects, the following
+%% properties should hold:
+%%
+%% <ul>
+%% <li>Get -> Put: Writing the same value as was read should result in
+%% the original structure.</li>
+%% <li>Put -> Get: Reading a value that was written should result in
+%% the same value as was written.</li>
+%% <li>Put -> Put: Writing a value twice should result in only the
+%% last written value.</li>
+%% </ul>
+%% @end
+-spec new(optic_mapfold() | undefined, optic_fold() | undefined) -> optic().
+new(MapFold, undefined) ->
+    new(MapFold);
+new(MapFold, Fold) ->
     #optic{fold=Fold, mapfold=MapFold}.
 
+%% @doc
+%% Compose a list of optics into a single optic which traverses over
+%% the same structure. This is used to combine multiple optics into a
+%% single optic which traverses over the sum of all the targets.
+%%
+%% This is different than the composition used by the traversal
+%% functions which apply the composed optics to the previous focused
+%% value, instead of to the same value.
+%% @end
 -spec from(optics()) -> optic().
 from([]) ->
     optic_generic:id();
 from([Head | Tail]) ->
     lists:foldl(fun compose/2, Head, Tail).
 
+%% @private
+%% @doc
+%% Internal interface for generating optics which support a range of
+%% optional behaviours. The optic must return {error, undefined} when
+%% it encounters an unknown type for these options to work. Due to the
+%% restrictions this places on optic behaviour it is intended only for
+%% internal use.
+%%
+%% Optics with the create option enabled are not well behaved, and may
+%% exhibit unexpected behaviour when composed.
+%% @end
 -spec '%extend'(optic(), extend_options(), optic_new()) -> optic().
 '%extend'(#optic{} = Optic, Options, New) when is_list(Options) ->
     Strict = proplists:get_bool(strict, Options),
@@ -77,7 +159,7 @@ from([Head | Tail]) ->
         end
     end,
     NewOptions = maps:remove(create, Options),
-    '%extend'(optic:new(Fold, NewMapFold), NewOptions, New);
+    '%extend'(optic:new(NewMapFold, Fold), NewOptions, New);
 '%extend'(#optic{} = Optic, #{strict:=true} = Options, New) ->
     NewOptions = maps:remove(strict, Options),
     '%extend'(Optic, NewOptions, New);
@@ -99,14 +181,22 @@ from([Head | Tail]) ->
         end
     end,
     NewOptions = maps:remove(strict, Options),
-    '%extend'(optic:new(LaxFold, LaxMapFold), NewOptions, New);
+    '%extend'(optic:new(LaxMapFold, LaxFold), NewOptions, New);
 '%extend'(#optic{} = Optic, Options, _New) when map_size(Options) == 0 ->
     Optic.
 
+%% @doc
+%% Given a list of optics, performs a recursive fold over the result
+%% of focusing on the given data structure.
+%% @end
 -spec fold(optics(), term(), callback_fold(), term()) -> option(term()).
 fold(Optics, Data, Fold, Acc) ->
     fold_maybe(Optics, Data, Fold, {ok, Acc}).
 
+%% @doc
+%% Given a list of optics, returns a list of the values focused on by
+%% the final optic.
+%% @end
 -spec get(optics(), term()) -> option([term()]).
 get(Optics, Data) ->
     case fold(Optics,
@@ -119,10 +209,18 @@ get(Optics, Data) ->
             Error
     end.
 
+%% @doc
+%% Given a list of optics, performs a recursive map and fold over the
+%% result of focusing on the given data structure.
+%% @end
 -spec mapfold(optics(), term(), callback_mapfold(), term()) -> option({term(), term()}).
 mapfold(Optics, Data, MapFold, Acc) ->
     mapfold_maybe(Optics, Data, MapFold, {ok, Acc}).
 
+%% @doc
+%% Given a list of optics, performs a recursive map over teh result of
+%% focusing on the given data structure.
+%% @end
 -spec map(optics(), term(), callback_map()) -> option(term()).
 map(Optics, Data, Map) ->
     case mapfold(Optics,
@@ -135,6 +233,10 @@ map(Optics, Data, Map) ->
             Error
     end.
 
+%% @doc
+%% Given a list of optics, modifies the values focused on by
+%% the final optic.
+%% @end
 -spec put(optics(), term(), term()) -> option(term()).
 put(Optics, Data, Value) ->
     map(Optics, Data, fun (_) -> Value end).
@@ -161,7 +263,7 @@ compose(#optic{fold=Fold1, mapfold=MapFold1},
                 Error
         end
     end,
-    optic:new(Fold, MapFold).
+    new(MapFold, Fold).
 
 fold_maybe(_Optics, _Data, _Fold, {error, _} = Error) ->
     Error;
