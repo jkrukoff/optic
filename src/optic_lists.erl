@@ -113,7 +113,3 @@ nth(N, Options) ->
     end,
     Optic = optic:new(Fold, MapFold),
     optic:'%extend'(Optic, Options, New).
-
-%%%===================================================================
-%%% Internal Functions
-%%%===================================================================
