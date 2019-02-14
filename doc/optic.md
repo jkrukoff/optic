@@ -19,9 +19,10 @@
 
 
 <pre><code>
-callback_fold() = fun((term(), term()) -&gt; term())
+callback_fold() = fun((Elem::term(), NewAcc::term()) -&gt; Acc::term())
 </code></pre>
 
+ Callback function invoked by fold for each element of a container.
 
 
 
@@ -29,9 +30,10 @@ callback_fold() = fun((term(), term()) -&gt; term())
 
 
 <pre><code>
-callback_map() = fun((term()) -&gt; term())
+callback_map() = fun((Elem::term()) -&gt; NewElem::term())
 </code></pre>
 
+ Callback function invoked by map for each element of a container.
 
 
 
@@ -39,9 +41,11 @@ callback_map() = fun((term()) -&gt; term())
 
 
 <pre><code>
-callback_mapfold() = fun((term(), term()) -&gt; {term(), term()})
+callback_mapfold() = fun((Elem::term(), Acc::term()) -&gt; {NewElem::term(), NewAcc::term()})
 </code></pre>
 
+ Callback function invoked by mapfold for each element of a
+container.
 
 
 
@@ -49,9 +53,10 @@ callback_mapfold() = fun((term(), term()) -&gt; {term(), term()})
 
 
 <pre><code>
-error() = {error, atom()}
+error() = {error, term()}
 </code></pre>
 
+ The expected error format.
 
 
 
@@ -62,6 +67,7 @@ error() = {error, atom()}
 extend_options() = #{create =&gt; term(), strict =&gt; boolean()} | [<a href="proplists.md#type-property">proplists:property()</a>]
 </code></pre>
 
+ Shared options to control optic construction.
 
 
 
@@ -70,6 +76,7 @@ extend_options() = #{create =&gt; term(), strict =&gt; boolean()} | [<a href="pr
 
 __abstract datatype__: `optic()`
 
+ A composable traversal over an arbitrary container.
 
 
 
@@ -77,9 +84,10 @@ __abstract datatype__: `optic()`
 
 
 <pre><code>
-optic_fold() = fun((<a href="#type-callback_fold">callback_fold()</a>, term(), term()) -&gt; <a href="#type-option">option</a>(term()))
+optic_fold() = fun((Fold::<a href="#type-callback_fold">callback_fold()</a>, Acc::term(), Data::term()) -&gt; <a href="#type-option">option</a>(NewAcc::term()))
 </code></pre>
 
+ A fold function to be used as part of an optic.
 
 
 
@@ -87,17 +95,21 @@ optic_fold() = fun((<a href="#type-callback_fold">callback_fold()</a>, term(), t
 
 
 <pre><code>
-optic_mapfold() = fun((<a href="#type-callback_mapfold">callback_mapfold()</a>, term(), term()) -&gt; <a href="#type-option">option</a>({term(), term()}))
+optic_mapfold() = fun((MapFold::<a href="#type-callback_mapfold">callback_mapfold()</a>, Acc::term(), Data::term()) -&gt; <a href="#type-option">option</a>({NewData::term(), NewAcc::term()}))
 </code></pre>
 
+ A mapfold function to be used as part of an optic.
 
 
 
 ### <a name="type-optics">optics()</a> ###
 
 
-__abstract datatype__: `optics()`
+<pre><code>
+optics() = [<a href="#type-optic">optic()</a>]
+</code></pre>
 
+ A list of traversals to be composed.
 
 
 
@@ -107,6 +119,8 @@ __abstract datatype__: `optics()`
 <pre><code>
 option(Success) = {ok, Success} | <a href="#type-error">error()</a>
 </code></pre>
+
+ A result type for operations that might fail.
 
 <a name="index"></a>
 
@@ -120,7 +134,7 @@ Compose a list of optics into a single optic which traverses over
 the same structure.</td></tr><tr><td valign="top"><a href="#get-2">get/2</a></td><td>
 Given a list of optics, returns a list of the values focused on by
 the final optic.</td></tr><tr><td valign="top"><a href="#map-3">map/3</a></td><td>
-Given a list of optics, performs a recursive map over teh result of
+Given a list of optics, performs a recursive map over the result of
 focusing on the given data structure.</td></tr><tr><td valign="top"><a href="#mapfold-4">mapfold/4</a></td><td>
 Given a list of optics, performs a recursive map and fold over the
 result of focusing on the given data structure.</td></tr><tr><td valign="top"><a href="#new-1">new/1</a></td><td>
@@ -139,21 +153,33 @@ the final optic.</td></tr></table>
 ### fold/4 ###
 
 <pre><code>
-fold(Optics::<a href="#type-optics">optics()</a>, Data::term(), Fold::<a href="#type-callback_fold">callback_fold()</a>, Acc::term()) -&gt; <a href="#type-option">option</a>(term())
+fold(Optics::<a href="#type-optics">optics()</a>, Data::term(), Fold::<a href="#type-callback_fold">callback_fold()</a>, Acc::term()) -&gt; NewAcc::<a href="#type-option">option</a>(term())
 </code></pre>
 <br />
 
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`Fold`: The callback function to invoke on the focused elements and
+  accumulator. Expected to return the modified accumulator.<br />`Acc`: The initial accumulator value.<br />
+
+returns: 
+On success, returns a tuple of ok and the final accumulator value.
+On failure, returns an error tuple.
+
 Given a list of optics, performs a recursive fold over the result
-of focusing on the given data structure.
+of focusing on the given data structure. The order of traversal is
+determined by the optics used.
 
 <a name="from-1"></a>
 
 ### from/1 ###
 
 <pre><code>
-from(Tail::<a href="#type-optics">optics()</a>) -&gt; <a href="#type-optic">optic()</a>
+from(Optics::<a href="#type-optics">optics()</a>) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
 <br />
+
+`Optics`: A list of optics to compose. Leftmost is applied first.<br />
+
+returns: An opaque optic record.
 
 Compose a list of optics into a single optic which traverses over
 the same structure. This is used to combine multiple optics into a
@@ -162,6 +188,8 @@ single optic which traverses over the sum of all the targets.
 This is different than the composition used by the traversal
 functions which apply the composed optics to the previous focused
 value, instead of to the same value.
+
+__See also:__ [new/2](#new-2).
 
 <a name="get-2"></a>
 
@@ -172,6 +200,10 @@ get(Optics::<a href="#type-optics">optics()</a>, Data::term()) -&gt; <a href="#t
 </code></pre>
 <br />
 
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />
+
+returns: A list of the focused values.
+
 Given a list of optics, returns a list of the values focused on by
 the final optic.
 
@@ -180,11 +212,18 @@ the final optic.
 ### map/3 ###
 
 <pre><code>
-map(Optics::<a href="#type-optics">optics()</a>, Data::term(), Map::<a href="#type-callback_map">callback_map()</a>) -&gt; <a href="#type-option">option</a>(term())
+map(Optics::<a href="#type-optics">optics()</a>, Data::term(), Map::<a href="#type-callback_map">callback_map()</a>) -&gt; <a href="#type-option">option</a>(NewData::term())
 </code></pre>
 <br />
 
-Given a list of optics, performs a recursive map over teh result of
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`Map`: The callback function to invoke on the focused elements. Expected
+  to return a modified element.<br />
+
+returns: 
+On success, returns a tuple of ok and the modified container.
+On failure, returns an error tuple.
+
+Given a list of optics, performs a recursive map over the result of
 focusing on the given data structure.
 
 <a name="mapfold-4"></a>
@@ -192,9 +231,18 @@ focusing on the given data structure.
 ### mapfold/4 ###
 
 <pre><code>
-mapfold(Optics::<a href="#type-optics">optics()</a>, Data::term(), MapFold::<a href="#type-callback_mapfold">callback_mapfold()</a>, Acc::term()) -&gt; <a href="#type-option">option</a>({term(), term()})
+mapfold(Optics::<a href="#type-optics">optics()</a>, Data::term(), MapFold::<a href="#type-callback_mapfold">callback_mapfold()</a>, Acc::term()) -&gt; <a href="#type-option">option</a>({NewData::term(), NewAcc::term()})
 </code></pre>
 <br />
+
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`MapFold`: The callback function to invoke on the focused elements and
+  accumulator. Expected to return a tuple of the modified element and
+  accumulator.<br />`Acc`: The initial accumulator value.<br />
+
+returns: 
+On success, returns a tuple of ok and a tuple of the modified
+container and the final accumulator value. On failure, returns an
+error tuple.
 
 Given a list of optics, performs a recursive map and fold over the
 result of focusing on the given data structure.
@@ -207,6 +255,8 @@ result of focusing on the given data structure.
 new(MapFold::<a href="#type-optic_mapfold">optic_mapfold()</a> | undefined) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
 <br />
+
+returns: An opaque optic record.
 
 Create a new optic for traversing a data structure.
 
@@ -224,30 +274,29 @@ new(MapFold::<a href="#type-optic_mapfold">optic_mapfold()</a> | undefined, Fold
 </code></pre>
 <br />
 
+`MapFold`: At a minimum, an optic requires a mapfold function to be provided
+  for both collecting and modifying values. This function must take
+  three arguments; a callback function, an initial accumulator value
+  and an arbitrary structure to traverse. The callback function will
+  expect two values; an element and the current accumulator. It will
+  return a two item tuple with the modified element and the modified
+  accumulator. The mapfold function will return a two item tuple with
+  the modified structure and the final accumulator value, wrapped in
+  an ok or error tagged tuple.<br />`Fold`: A fold function can also be provided for more efficient traversal
+  without modification. If one is not provided, it will be
+  inefficiently inferred from the MapFold function. This function
+  must take three arguments; a callback function, an initial
+  accumulator value and an arbitrary structure to traverse. The
+  callback function will expect two values; an element and the
+  current accumulator. It will return the modified accumulator. The
+  fold function will return a final accumulator value, wrapped in an
+  ok or error tagged tuple.<br />
+
+returns: An opaque optic record.
+
 Create a new optic for traversing a data structure.
 
-At a minimum, an optic requires a mapfold function to be provided
-for both collecting and modifying values. This function must take
-three arguments; a callback function, an initial accumulator value
-and an arbitrary structure to traverse. The callback function will
-expect two values; an element and the current accumulator. It will
-return a two item tuple with the modified element and the modified
-accumulator. The mapfold function will return a two item tuple with
-the modified structure and the final accumulator value, wrapped in
-an ok or error tagged tuple.
-
-A fold function can also be provided for more efficient traversal
-without modification. If one is not provided, it will be
-inefficiently inferred from the mapfold function. This function
-must take three arguments; a callback function, an initial
-accumulator value and an arbitrary structure to traverse. The
-callback function will expect two values; an element and the
-current accumulator. It will return the modified accumulator. The
-fold function will return a final accumulator value, wrapped in an
-ok or error tagged tuple.
-
-To compose optics without unexpected side effects, the following
-properties should hold:
+Well behaved optics should implement the following properties:
 
 * Get -> Put: Writing the same value as was read should result in
 the original structure.
@@ -259,6 +308,11 @@ the same value as was written.
 last written value.
 
 
+Optics which are not well behaved will be more difficult to use and
+compose with other optics. Their behaviour will change depending on
+the order in which they are applied and the number of times they
+are applied.
+
 <a name="put-3"></a>
 
 ### put/3 ###
@@ -267,6 +321,10 @@ last written value.
 put(Optics::<a href="#type-optics">optics()</a>, Data::term(), Value::term()) -&gt; <a href="#type-option">option</a>(term())
 </code></pre>
 <br />
+
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.
+  On success, returns a tuple of ok and the modified container.
+  On failure, returns an error tuple.<br />
 
 Given a list of optics, modifies the values focused on by
 the final optic.

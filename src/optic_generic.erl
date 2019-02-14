@@ -1,6 +1,10 @@
 %%%-------------------------------------------------------------------
 %%% @doc
+%%% A set of generic optics that can be applied to multiple container
+%%% types.
 %%%
+%%% Intended both as a convenience and to support optic creation from
+%%% parsed paths in optic_path.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(optic_generic).
