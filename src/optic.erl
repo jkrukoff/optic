@@ -146,7 +146,7 @@ new(MapFold, Fold) ->
     #optic{fold=Fold, mapfold=MapFold}.
 
 %% @doc
-%% Compose a list of optics into a single optic which traverses over
+%% Compose a list of optics into a single optic which traverse over
 %% the same structure. This is used to combine multiple optics into a
 %% single optic which traverses over the sum of all the targets.
 %%

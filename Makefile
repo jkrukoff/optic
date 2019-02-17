@@ -2,7 +2,7 @@ MAKEFLAGS += --warn-undefined-variables
 .DEFAULT_GOAL := all
 
 PYTHON := python3
-REBAR ?= ./rebar3
+REBAR ?= ${if ${wildcard ./rebar3}, ./rebar3, rebar3}
 
 .PHONY: all
 ## Build everything.

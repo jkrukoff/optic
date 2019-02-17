@@ -1,3 +1,4 @@
+# Erlang build and crash files.
 *.beam
 *.o
 *.plt
@@ -8,6 +9,7 @@ ebin
 erl_crash.dump
 log
 logs
+rebar3
 rebar3.crashdump
 .rebar3
 
