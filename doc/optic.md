@@ -6,8 +6,14 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-.
+A library for creating "optics", a composable traversal over
+arbitrary containers.
 
+<a name="description"></a>
+
+## Description ##
+These optics can then be composed to read and update nested data
+structures.
 <a name="types"></a>
 
 ## Data Types ##
@@ -130,7 +136,7 @@ option(Success) = {ok, Success} | <a href="#type-error">error()</a>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#fold-4">fold/4</a></td><td>
 Given a list of optics, performs a recursive fold over the result
 of focusing on the given data structure.</td></tr><tr><td valign="top"><a href="#from-1">from/1</a></td><td>
-Compose a list of optics into a single optic which traverses over
+Compose a list of optics into a single optic which traverse over
 the same structure.</td></tr><tr><td valign="top"><a href="#get-2">get/2</a></td><td>
 Given a list of optics, returns a list of the values focused on by
 the final optic.</td></tr><tr><td valign="top"><a href="#map-3">map/3</a></td><td>
@@ -181,7 +187,7 @@ from(Optics::<a href="#type-optics">optics()</a>) -&gt; <a href="#type-optic">op
 
 returns: An opaque optic record.
 
-Compose a list of optics into a single optic which traverses over
+Compose a list of optics into a single optic which traverse over
 the same structure. This is used to combine multiple optics into a
 single optic which traverses over the sum of all the targets.
 
@@ -322,9 +328,11 @@ put(Optics::<a href="#type-optics">optics()</a>, Data::term(), Value::term()) -&
 </code></pre>
 <br />
 
-`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.
-  On success, returns a tuple of ok and the modified container.
-  On failure, returns an error tuple.<br />
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />
+
+returns: 
+On success, returns a tuple of ok and the modified container.
+On failure, returns an error tuple.
 
 Given a list of optics, modifies the values focused on by
 the final optic.

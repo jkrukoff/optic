@@ -1,4 +1,4 @@
 %% encoding: UTF-8
 {application,optic}.
-{modules,[optic,optic_generic,optic_lists,optic_maps,optic_proplists,
-          optic_tuples]}.
+{modules,[optic,optic_generic,optic_lists,optic_maps,optic_path,
+          optic_proplists,optic_tuples]}.

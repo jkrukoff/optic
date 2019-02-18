@@ -5,9 +5,14 @@
 * [Function Index](#index)
 * [Function Details](#functions)
 
-.
+A set of generic optics that can be applied to multiple container
+types.
 
-<a name="index"></a>
+<a name="description"></a>
+
+## Description ##
+Intended both as a convenience and to support optic creation from
+parsed paths in optic_path.<a name="index"></a>
 
 ## Function Index ##
 

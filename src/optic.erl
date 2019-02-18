@@ -3,7 +3,7 @@
 %%% A library for creating "optics", a composable traversal over
 %%% arbitrary containers.
 %%%
-%%% These optics can then be composed to read and modify nested data
+%%% These optics can then be composed to read and update nested data
 %%% structures.
 %%% @end
 %%%-------------------------------------------------------------------
