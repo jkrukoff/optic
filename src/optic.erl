@@ -1,6 +1,10 @@
 %%%-------------------------------------------------------------------
 %%% @doc
+%%% A library for creating "optics", a composable traversal over
+%%% arbitrary containers.
 %%%
+%%% These optics can then be composed to read and modify nested data
+%%% structures.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(optic).
@@ -194,41 +198,23 @@ from([Head | Tail]) ->
             RequiredOptions
     end,
     '%extend'(Optic, OptionalOptions, New);
-'%extend'(#optic{fold=Fold, mapfold=MapFold}, #{create:=Template} = Options, New) ->
-    NewMapFold = fun(Fun, Acc, Data) ->
-        case MapFold(Fun, Acc, Data) of
-            {error, undefined} ->
-                MapFold(Fun, Acc, New(Data, Template));
-            Result ->
-                Result
-        end
+'%extend'(#optic{} = Optic, #{} = Options, New) ->
+    CreateOptic = case maps:is_key(create, Options) of
+        true ->
+            #{create:=Template} = Options,
+            extend_create(Optic, New, Template);
+        false ->
+            Optic
     end,
-    NewOptions = maps:remove(create, Options),
-    '%extend'(optic:new(NewMapFold, Fold), NewOptions, New);
-'%extend'(#optic{} = Optic, #{strict:=true} = Options, New) ->
-    NewOptions = maps:remove(strict, Options),
-    '%extend'(Optic, NewOptions, New);
-'%extend'(#optic{fold=Fold, mapfold=MapFold}, #{strict:=false} = Options, New) ->
-    LaxFold = fun(Fun, Acc, Data) ->
-        case Fold(Fun, Acc, Data) of
-            {error, undefined} ->
-                {ok, Acc};
-            Result ->
-                Result
-        end
+    StrictOptic = case maps:get(strict, Options, false) of
+        true ->
+            CreateOptic;
+        false ->
+            extend_lax(CreateOptic);
+        Error ->
+            throw({invalid_strict_value, Error})
     end,
-    LaxMapFold = fun(Fun, Acc, Data) ->
-        case MapFold(Fun, Acc, Data) of
-            {error, undefined} ->
-                {ok, {Data, Acc}};
-            Result ->
-                Result
-        end
-    end,
-    NewOptions = maps:remove(strict, Options),
-    '%extend'(optic:new(LaxMapFold, LaxFold), NewOptions, New);
-'%extend'(#optic{} = Optic, Options, _New) when map_size(Options) == 0 ->
-    Optic.
+    StrictOptic.
 
 %% @doc
 %% Given a list of optics, performs a recursive fold over the result
@@ -322,6 +308,7 @@ map(Optics, Data, Map) ->
 %% @end
 %% @param Optics A list of optics to apply. Leftmost is applied first.
 %% @param Data The container to apply the optics to.
+%% @returns
 %% On success, returns a tuple of ok and the modified container.
 %% On failure, returns an error tuple.
 %% @end
@@ -336,22 +323,52 @@ put(Optics, Data, Value) ->
 compose(#optic{fold=Fold1, mapfold=MapFold1},
         #optic{fold=Fold2, mapfold=MapFold2}) ->
     Fold = fun (Fun, Acc, Data) ->
-        case Fold1(Fun, Acc, Data) of
+        case Fold2(Fun, Acc, Data) of
             {ok, NewAcc} ->
-                Fold2(Fun, NewAcc, Data);
+                Fold1(Fun, NewAcc, Data);
             {error, _} = Error ->
                 Error
         end
     end,
     MapFold = fun (Fun, Acc, Data) ->
-        case MapFold1(Fun, Acc, Data) of
+        case MapFold2(Fun, Acc, Data) of
             {ok, {NewData, NewAcc}} ->
-                MapFold2(Fun, NewAcc, NewData);
+                MapFold1(Fun, NewAcc, NewData);
             {error, _} = Error ->
                 Error
         end
     end,
     new(MapFold, Fold).
+
+extend_create(#optic{fold=Fold, mapfold=MapFold}, New, Template) ->
+    NewMapFold = fun(Fun, Acc, Data) ->
+        case MapFold(Fun, Acc, Data) of
+            {error, undefined} ->
+                MapFold(Fun, Acc, New(Data, Template));
+            Result ->
+                Result
+        end
+    end,
+    optic:new(NewMapFold, Fold).
+
+extend_lax(#optic{fold=Fold, mapfold=MapFold}) ->
+    LaxFold = fun(Fun, Acc, Data) ->
+        case Fold(Fun, Acc, Data) of
+            {error, undefined} ->
+                {ok, Acc};
+            Result ->
+                Result
+        end
+    end,
+    LaxMapFold = fun(Fun, Acc, Data) ->
+        case MapFold(Fun, Acc, Data) of
+            {error, undefined} ->
+                {ok, {Data, Acc}};
+            Result ->
+                Result
+        end
+    end,
+    optic:new(LaxMapFold, LaxFold).
 
 fold_maybe(_Optics, _Data, _Fold, {error, _} = Error) ->
     Error;
