@@ -14,12 +14,16 @@
 all_get_test_() ->
     [?_assertEqual({ok, [1, 2, 3]},
                    optic:get([optic_lists:all([strict])], [1, 2, 3])),
+     ?_assertEqual({ok, []},
+                   optic:get([optic_lists:all()], atom)),
      ?_assertEqual({error, undefined},
                    optic:get([optic_lists:all([strict])], atom))].
 
 all_put_test_() ->
     [?_assertEqual({ok, [4, 4, 4]},
                    optic:put([optic_lists:all([strict])], [1, 2, 3], 4)),
+     ?_assertEqual({ok, atom},
+                   optic:put([optic_lists:all()], atom, 4)),
      ?_assertEqual({error, undefined},
                    optic:put([optic_lists:all([strict])], atom, 4))].
 
