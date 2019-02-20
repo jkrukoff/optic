@@ -252,7 +252,7 @@ appreciated.
 
 <h3>Lineage</h3>
 
-I first encountered lenses via the<a
+I first encountered lenses via the <a
 href="https://github.com/fogfish/datum">Datum</a> library, but wanted a
 version that supported traversables instead of lenses in order to support
 updating multiple elements. As lenses are a special case of traversables, this
