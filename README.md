@@ -261,12 +261,13 @@ appreciated.
 
 ### Lineage ###
 
-I first encountered lenses via the[Datum](https://github.com/fogfish/datum) library, but wanted a
-version that supported traversables instead of lenses in order to support
-updating multiple elements. As lenses are a special case of traversables, this
-allowed for using a single type to represent both.
+I first encountered lenses via the [Datum](https://github.com/fogfish/datum)
+library, but wanted a version that supported traversables instead of lenses in
+order to support updating multiple elements. As lenses are a special case of
+traversables, this allowed for using a single type to represent both.
 
-There are a number of good introductions to lenses, [this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
+There are a number of good introductions to lenses,
+[this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
 was the most accessible for me.
 
 This library was initially conceived with the intention of making it easy to
