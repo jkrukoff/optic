@@ -23,18 +23,33 @@
 %%% API
 %%%===================================================================
 
+%% @see values/1
 -spec all() -> optic:optic().
 all() ->
     values().
 
+%% @see values/1
 -spec all(optic:extend_options()) -> optic:optic().
 all(Options) ->
     values(Options).
 
+%% @see keys/1
 -spec keys() -> optic:optic().
 keys() ->
     keys(#{}).
 
+%% @doc
+%% Focus on all keys of a map.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_maps:keys()], #{first => 1, second => 2).
+%% {ok,[first,second]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec keys(optic:extend_options()) -> optic:optic().
 keys(Options) ->
     Fold = fun (Fun, Acc, Map) when is_map(Map) ->
@@ -62,10 +77,23 @@ keys(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see values/1
 -spec values() -> optic:optic().
 values() ->
     values(#{}).
 
+%% @doc
+%% Focus on all values of a map.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_maps:values()], #{first => 1, second => 2).
+%% {ok,[1,2]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec values(optic:extend_options()) -> optic:optic().
 values(Options) ->
     Fold = fun (Fun, Acc, Map) when is_map(Map) ->
@@ -93,10 +121,24 @@ values(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see associations/1
 -spec associations() -> optic:optic().
 associations() ->
     associations(#{}).
 
+%% @doc
+%% Focus on all associations of a map. An association is a tuple of
+%% the key and value for each entry.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_maps:associations()], #{first => 1, second => 2).
+%% {ok,[{first,1},{second,2}]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec associations(optic:extend_options()) -> optic:optic().
 associations(Options) ->
     Fold = fun (Fun, Acc, Map) when is_map(Map) ->
@@ -124,10 +166,24 @@ associations(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see key/2
 -spec key(term()) -> optic:optic().
 key(Key) ->
     key(Key, #{}).
 
+%% @doc
+%% Focus on the value of a map key.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_maps:key(first)], #{first => 1, second => 2).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param Key The key to focus on.
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec key(term(), optic:extend_options()) -> optic:optic().
 key(Key, Options) ->
     Fold = fun (Fun, Acc, #{Key:=Value}) ->
@@ -149,10 +205,26 @@ key(Key, Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see association/2
 -spec association(term()) -> optic:optic().
 association(Key) ->
     association(Key, #{}).
 
+%% @doc
+%% Focus on the association for a map key. An association is the tuple
+%% of a map key and value. If the key is modified, the optic is no
+%% longer well behaved.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_maps:association(first)], #{first => 1, second => 2).
+%% {ok,[{first,1}]}
+%% '''
+%% @end
+%% @param Key The key to focus on.
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec association(term(), optic:extend_options()) -> optic:optic().
 association(Key, Options) ->
     Fold = fun (Fun, Acc, #{Key:=Value}) ->

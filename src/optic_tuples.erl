@@ -17,10 +17,23 @@
 %%% API
 %%%===================================================================
 
+%% @see all/1
 -spec all() -> optic:optic().
 all() ->
     all(#{}).
 
+%% @doc
+%% Focus on all elements of a tuple.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_tuples:all()], {1,2,3}).
+%% {ok,[1,2,3]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec all(optic:extend_options()) -> optic:optic().
 all(Options) ->
     Fold = fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
@@ -40,10 +53,25 @@ all(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see element/2
 -spec element(pos_integer()) -> optic:optic().
 element(N) ->
     optic_tuples:element(N, #{}).
 
+%% @doc
+%% Focus on the nth element of a tuple. As with `erlang:element/2',
+%% indexing begins at 1.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_tuples:element(1)], {1,2,3}).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param N The index of the tuple element to focus on.
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec element(pos_integer(), optic:extend_options()) -> optic:optic().
 element(N, Options) ->
     Fold = fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
@@ -68,10 +96,36 @@ element(N, Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see field/4
 -spec field(atom(), pos_integer(), pos_integer()) -> optic:optic().
 field(Tag, Size, N) ->
     field(Tag, Size, N, #{}).
 
+%% @doc
+%% Focus on a record field. As records are a compiler construct, this
+%% depends on the `?OPTIC_FIELD' macro in `include/optic_tuples.hrl'
+%% to construct the required arguments from the record definition.
+%%
+%% Given the record definition:
+%%
+%% ```
+%% -include_lib("optic/include/optic_tuples.hrl").
+%% -record(example, {first}).
+%% '''
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_tuples:field(?OPTIC_FIELD(example, first))],
+%%             #example{first=1}).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param Tag The expected record tag.
+%% @param Size The expected record size.
+%% @param N The index of the field in the record tuple.
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec field(atom(), pos_integer(), pos_integer(), optic:extend_options()) -> optic:optic().
 field(Tag, Size, N, Options) ->
     Fold = fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,

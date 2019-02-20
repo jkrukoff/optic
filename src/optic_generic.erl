@@ -5,6 +5,10 @@
 %%%
 %%% Intended both as a convenience and to support optic creation from
 %%% parsed paths in optic_path.
+%%%
+%%% Because of the ambiguis types they support, these optics do not
+%%% support the standard optic options. Instead, they always skip
+%%% unexpected types and never create missing values.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(optic_generic).
@@ -18,6 +22,17 @@
 %%% API
 %%%===================================================================
 
+%% @doc
+%% The identity optic, focuses on what was given.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_generic:id()], [1,2,3]).
+%% {ok,[[1,2,3]]}
+%% '''
+%% @end
+%% @returns An opaque optic record.
 -spec id() -> optic:optic().
 id() ->
     Fold = fun (Fun, Acc, Data) ->
@@ -25,6 +40,20 @@ id() ->
     end,
     optic:new(Fold, Fold).
 
+%% @doc
+%% Focus on the value of many different key/value like mappings.
+%% Understands how to focus on maps, property lists, dicts, orddicts
+%% and gb_trees. Does not support the usual optic options.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_generic:key(first)], #{first => 1}).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param Key The key to focus on.
+%% @returns An opaque optic record.
 -spec key(term()) -> optic:optic().
 key(Key) ->
     Fold = fun (Fun, Acc, Map) when is_map(Map) ->
@@ -114,6 +143,20 @@ key(Key) ->
     end,
     optic:new(MapFold, Fold).
 
+%% @doc
+%% Focus on an element of a list like container. Indexing begins at 1.
+%% Understands how to focus on lists and tuples. Does not support the
+%% usual optic options.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_generic:index(3)], [1, 2, 3]).
+%% {ok,[3]}
+%% '''
+%% @end
+%% @param Index The one based index of the element to focus on.
+%% @returns An opaque optic record.
 -spec index(non_neg_integer()) -> optic:optic().
 index(Index) ->
     Fold = fun (Fun, Acc, List) when Index =< length(List) ->

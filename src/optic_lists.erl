@@ -24,6 +24,18 @@
 all() ->
     all(#{}).
 
+%% @doc
+%% Focus on all elements of a list.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_lists:all()], [1,2,3]).
+%% {ok,[1,2,3]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec all(optic:extend_options()) -> optic:optic().
 all(Options) ->
     Fold = fun (Fun, Acc, List) when is_list(List) ->
@@ -42,10 +54,24 @@ all(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see head/1
 -spec head() -> optic:optic().
 head() ->
     head(#{}).
 
+%% @doc
+%% Focus on the head of a list. The list must have at least one
+%% element to have a head.
+%% 
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_lists:head()], [1,2,3]).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec head(optic:extend_options()) -> optic:optic().
 head(Options) ->
     Fold = fun (Fun, Acc, [Head | _]) ->
@@ -65,10 +91,24 @@ head(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see tail/1
 -spec tail() -> optic:optic().
 tail() ->
     tail(#{}).
 
+%% @doc
+%% Focus on the tail of a list. A list must have at least one element
+%% to have a tail.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_lists:tail()], [1,2,3]).
+%% {ok,[2,3]}
+%% '''
+%% @end
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec tail(optic:extend_options()) -> optic:optic().
 tail(Options) ->
     Fold = fun (Fun, Acc, [_ | Tail]) ->
@@ -88,10 +128,25 @@ tail(Options) ->
     Optic = optic:new(MapFold, Fold),
     optic:'%extend'(Optic, Options, New).
 
+%% @see nth/2
 -spec nth(pos_integer()) -> optic:optic().
 nth(N) ->
     nth(N, #{}).
 
+%% @doc
+%% Focus on the nth element of a list. As with `lists:nth/2', indexing
+%% begins at 1.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic_lists:nth(1)], [1,2,3]).
+%% {ok,[1]}
+%% '''
+%% @end
+%% @param N The index of the list element to focus on.
+%% @param Options Common optic options.
+%% @returns An opaque optic record.
 -spec nth(pos_integer(), optic:extend_options()) -> optic:optic().
 nth(N, Options) ->
     Fold = fun (Fun, Acc, List) when N =< length(List) ->

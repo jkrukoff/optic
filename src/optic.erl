@@ -28,6 +28,9 @@
                                 {NewElem :: term(), NewAcc :: term()}).
 %% Callback function invoked by mapfold for each element of a
 %% container.
+-type callback_filter() :: fun((Elem :: term()) -> boolean()).
+%% Callback function invoked by filter optics for each element of a
+%% container.
 -type optic_fold() :: fun((Fold :: callback_fold(),
                            Acc :: term(),
                            Data :: term()) ->
@@ -43,7 +46,9 @@
                          NewData :: term()).
 %% An internal interface for creating new containers.
 
--type extend_options() :: #{create=>term(), strict=>boolean()} |
+-type extend_options() :: #{create=>term(),
+                            strict=>boolean(),
+                            filter=>callback_filter()} |
                           [proplists:property()].
 %% Shared options to control optic construction.
 
@@ -66,6 +71,7 @@
 -export_type([callback_map/0,
               callback_fold/0,
               callback_mapfold/0,
+              callback_filter/0,
               optic_fold/0,
               optic_mapfold/0,
               extend_options/0,
@@ -181,7 +187,11 @@ from([Head | Tail]) ->
 %% exhibit unexpected behaviour when composed.
 %% @end
 %% @param Optic The base optic to modify.
-%% @param Options The selected options.
+%% @param Options
+%% The selected options. Expected options are a boolean "strict" for
+%% if type errors should be reported or ignored, an arbitrarily valued
+%% "create" for if type errors should force container creation, and a
+%% "filter" function to restrict the elements selected.
 %% @param New
 %% When the "create" option is selected, the function to invoke to
 %% perform the creation.
@@ -189,14 +199,20 @@ from([Head | Tail]) ->
 %% @returns An opaque optic record.
 -spec '%extend'(Optic :: optic(), Options :: extend_options(), New :: optic_new()) -> optic().
 '%extend'(#optic{} = Optic, Options, New) when is_list(Options) ->
+    % Normalize proplist option form to map form.
     Strict = proplists:get_bool(strict, Options),
     RequiredOptions = #{strict=>Strict},
-    OptionalOptions = case proplists:lookup(create, Options) of
-        {create, Template} ->
-            RequiredOptions#{create=>Template};
-        none ->
-            RequiredOptions
-    end,
+    OptionalOptions = lists:foldl(
+        fun (Option, Acc) ->
+            case proplists:lookup(Option, Options) of
+                {Option, Value} ->
+                    Acc#{Option=>Value};
+                none ->
+                    Acc
+            end
+        end,
+        RequiredOptions,
+        [create, filter]),
     '%extend'(Optic, OptionalOptions, New);
 '%extend'(#optic{} = Optic, #{} = Options, New) ->
     CreateOptic = case maps:is_key(create, Options) of
@@ -211,10 +227,18 @@ from([Head | Tail]) ->
             CreateOptic;
         false ->
             extend_lax(CreateOptic);
-        Error ->
-            throw({invalid_strict_value, Error})
+        InvalidStrict ->
+            throw({invalid_strict_value, InvalidStrict})
     end,
-    StrictOptic.
+    FilterOptic = case maps:get(filter, Options, undefined) of
+        undefined ->
+            StrictOptic;
+        Filter when is_function(Filter) ->
+            extend_filter(StrictOptic, Filter);
+        InvalidFilter ->
+            throw({invalid_filter_value, InvalidFilter})
+    end,
+    FilterOptic.
 
 %% @doc
 %% Given a list of optics, performs a recursive fold over the result
@@ -350,6 +374,33 @@ extend_create(#optic{fold=Fold, mapfold=MapFold}, New, Template) ->
         end
     end,
     optic:new(NewMapFold, Fold).
+
+extend_filter(#optic{fold=Fold, mapfold=MapFold}, Filter) ->
+    FilterFold = fun(Fun, Acc, Data) ->
+        Fold(fun (Elem, InnerAcc) ->
+                 case Filter(Elem) of
+                     true ->
+                         Fun(Elem, InnerAcc);
+                     false ->
+                         InnerAcc
+                 end
+             end,
+             Acc,
+             Data)
+    end,
+    FilterMapFold = fun(Fun, Acc, Data) ->
+        MapFold(fun (Elem, InnerAcc) ->
+                    case Filter(Elem) of
+                        true ->
+                            Fun(Elem, InnerAcc);
+                        false ->
+                            {Elem, InnerAcc}
+                    end
+                end,
+                Acc,
+                Data)
+    end,
+    optic:new(FilterMapFold, FilterFold).
 
 extend_lax(#optic{fold=Fold, mapfold=MapFold}) ->
     LaxFold = fun(Fun, Acc, Data) ->

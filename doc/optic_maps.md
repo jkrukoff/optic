@@ -12,7 +12,12 @@ A set of optics specific to maps.
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#all-0">all/0</a></td><td></td></tr><tr><td valign="top"><a href="#all-1">all/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-1">association/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-2">association/2</a></td><td></td></tr><tr><td valign="top"><a href="#associations-0">associations/0</a></td><td></td></tr><tr><td valign="top"><a href="#associations-1">associations/1</a></td><td></td></tr><tr><td valign="top"><a href="#key-1">key/1</a></td><td></td></tr><tr><td valign="top"><a href="#key-2">key/2</a></td><td></td></tr><tr><td valign="top"><a href="#keys-0">keys/0</a></td><td></td></tr><tr><td valign="top"><a href="#keys-1">keys/1</a></td><td></td></tr><tr><td valign="top"><a href="#values-0">values/0</a></td><td></td></tr><tr><td valign="top"><a href="#values-1">values/1</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#all-0">all/0</a></td><td></td></tr><tr><td valign="top"><a href="#all-1">all/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-1">association/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-2">association/2</a></td><td>
+Focus on the association for a map key.</td></tr><tr><td valign="top"><a href="#associations-0">associations/0</a></td><td></td></tr><tr><td valign="top"><a href="#associations-1">associations/1</a></td><td>
+Focus on all associations of a map.</td></tr><tr><td valign="top"><a href="#key-1">key/1</a></td><td></td></tr><tr><td valign="top"><a href="#key-2">key/2</a></td><td>
+Focus on the value of a map key.</td></tr><tr><td valign="top"><a href="#keys-0">keys/0</a></td><td></td></tr><tr><td valign="top"><a href="#keys-1">keys/1</a></td><td>
+Focus on all keys of a map.</td></tr><tr><td valign="top"><a href="#values-0">values/0</a></td><td></td></tr><tr><td valign="top"><a href="#values-1">values/1</a></td><td>
+Focus on all values of a map.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -28,6 +33,8 @@ all() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [values/1](#values-1).
+
 <a name="all-1"></a>
 
 ### all/1 ###
@@ -36,6 +43,8 @@ all() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 all(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+__See also:__ [values/1](#values-1).
 
 <a name="association-1"></a>
 
@@ -46,6 +55,8 @@ association(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [association/2](#association-2).
+
 <a name="association-2"></a>
 
 ### association/2 ###
@@ -54,6 +65,21 @@ association(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 association(Key::term(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+`Key`: The key to focus on.<br />`Options`: Common optic options.<br />
+
+returns: An opaque optic record.
+
+Focus on the association for a map key. An association is the tuple
+of a map key and value. If the key is modified, the optic is no
+longer well behaved.
+
+Example:
+
+```
+  > optic:get([optic_maps:association(first)], #{first => 1, second => 2).
+  {ok,[{first,1}]}
+```
 
 <a name="associations-0"></a>
 
@@ -64,6 +90,8 @@ associations() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [associations/1](#associations-1).
+
 <a name="associations-1"></a>
 
 ### associations/1 ###
@@ -72,6 +100,20 @@ associations() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 associations(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+`Options`: Common optic options.<br />
+
+returns: An opaque optic record.
+
+Focus on all associations of a map. An association is a tuple of
+the key and value for each entry.
+
+Example:
+
+```
+  > optic:get([optic_maps:associations()], #{first => 1, second => 2).
+  {ok,[{first,1},{second,2}]}
+```
 
 <a name="key-1"></a>
 
@@ -82,6 +124,8 @@ key(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [key/2](#key-2).
+
 <a name="key-2"></a>
 
 ### key/2 ###
@@ -90,6 +134,19 @@ key(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 key(Key::term(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+`Key`: The key to focus on.<br />`Options`: Common optic options.<br />
+
+returns: An opaque optic record.
+
+Focus on the value of a map key.
+
+Example:
+
+```
+  > optic:get([optic_maps:key(first)], #{first => 1, second => 2).
+  {ok,[1]}
+```
 
 <a name="keys-0"></a>
 
@@ -100,6 +157,8 @@ keys() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [keys/1](#keys-1).
+
 <a name="keys-1"></a>
 
 ### keys/1 ###
@@ -108,6 +167,19 @@ keys() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 keys(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+`Options`: Common optic options.<br />
+
+returns: An opaque optic record.
+
+Focus on all keys of a map.
+
+Example:
+
+```
+  > optic:get([optic_maps:keys()], #{first => 1, second => 2).
+  {ok,[first,second]}
+```
 
 <a name="values-0"></a>
 
@@ -118,6 +190,8 @@ values() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
+__See also:__ [values/1](#values-1).
+
 <a name="values-1"></a>
 
 ### values/1 ###
@@ -126,4 +200,17 @@ values() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 values(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
+
+`Options`: Common optic options.<br />
+
+returns: An opaque optic record.
+
+Focus on all values of a map.
+
+Example:
+
+```
+  > optic:get([optic_maps:values()], #{first => 1, second => 2).
+  {ok,[1,2]}
+```
 

@@ -4,7 +4,7 @@
 
 Copyright (c) 2019 John Krukoff
 
-__Version:__ 0.1.0
+__Version:__ 1.0.0
 
 __Authors:__ John Krukoff ([`github@cultist.org`](mailto:github@cultist.org)).
 
@@ -103,6 +103,12 @@ individual values, the value of the create property is used as a template to
 create the needed default objects. Setting this property causes the optic to
 no longer be well behaved.
 
+* filter: When given, expects a value as a filter function to determine if
+the traversed element should be focused or skipped. The filter function should
+take a single arbitrary element and return a boolean true/false. If the
+criteria the filter function uses to select an element is modified, the
+filtered optic will no longer be well behaved.
+
 
 
 #### Examples ####
@@ -117,7 +123,7 @@ of maps and demonstrate various ways it can be processed:
 
 We can extract a single value using one of the lists optics to extract the
 head of the list, and combine it with an optic to extract the value of the
-_name_ key from the map.
+"name" key from the map.
 
 ```
 
@@ -136,7 +142,7 @@ change the list optic used to do so:
 {ok,[first,second,third]}
 ```
 
-Optics can also be composed using _optic:from/1_ in order to select
+Optics can also be composed using `optic:from/1` in order to select
 multiple elements at the same level. For instance, to select only the first
 two maps, we could do this:
 
@@ -197,16 +203,34 @@ behaviour is context dependent and will vary based on the optic used.
 {ok,[#{},#{},#{name => example}]}
 ```
 
-More complicated operations should refer to the fold, map and mapfold
-functions to allow for values to be computed during the traversal.
+Finally, the filter option can be used to control which elements are selected
+based on their values. For instance, say we wanted to only collect the status
+of maps with a particular name:
+
+```
+
+> Data = [#{name => first, status => ready},
+          #{name => second, status => ready},
+          #{name => third, status => delayed}].
+[#{name => first,status => ready},
+ #{name => second,status => ready},
+ #{name => third,status => delayed}]
+> optic:get([optic_lists:all([{filter,
+                               fun (Elem) -> maps:get(name, Elem) == third end}]),
+             optic_maps:key(status)], Data).
+{ok,[delayed]}
+```
+
+More complicated operations should refer to the `fold/4`, `map/3` and
+`mapfold/4` functions to allow for values to be computed during the traversal.
 
 
 #### Paths ####
 
-For traversing JSON like structures of maps and lists, the
-_optic_path_ module provides a simplified interface for optic
-construction. It parses a list of path components into a list of optics that
-can be used with any of the optic traversal functions.
+For traversing JSON like structures of maps and lists, the `optic_path` module
+provides a simplified interface for optic construction. It parses a list of
+path components into a list of optics that can be used with any of the optic
+traversal functions.
 
 ```
 
@@ -257,6 +281,12 @@ was the most accessible for me.
 This library was initially conceived with the intention of making it easy to
 modify deeply nested JSON, so JSON related data structures were the first
 implemented.
+
+Several generic transformations are possible on optics, but the required
+expectations are not always obvious or possible to enforce. As such, the
+choice was made to privilege the optics created by the library to allow for
+easily creating variations, since those could be expected to be implemented
+consistently.
 
 
 ### Attribution ###

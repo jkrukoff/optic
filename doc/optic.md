@@ -21,6 +21,18 @@ structures.
 
 
 
+### <a name="type-callback_filter">callback_filter()</a> ###
+
+
+<pre><code>
+callback_filter() = fun((Elem::term()) -&gt; boolean())
+</code></pre>
+
+ Callback function invoked by filter optics for each element of a
+container.
+
+
+
 ### <a name="type-callback_fold">callback_fold()</a> ###
 
 
@@ -70,7 +82,7 @@ error() = {error, term()}
 
 
 <pre><code>
-extend_options() = #{create =&gt; term(), strict =&gt; boolean()} | [<a href="proplists.md#type-property">proplists:property()</a>]
+extend_options() = #{create =&gt; term(), strict =&gt; boolean(), filter =&gt; <a href="#type-callback_filter">callback_filter()</a>} | [<a href="proplists.md#type-property">proplists:property()</a>]
 </code></pre>
 
  Shared options to control optic construction.
