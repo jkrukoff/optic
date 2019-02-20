@@ -42,6 +42,18 @@ We could then update all pets to a new status by:
 ```
 
 
+## Modules ##
+
+<table width="100%" border="0" summary="list of modules">
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_path.md" class="module">optic_path</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
+
+
 ### Getting Started ###
 
 This library is published to [hex.pm](https://hex.pm) as [optic](https://hex.pm/packages/optic). If you're using [rebar3](https://www.rebar3.org/) as your build tool, it can be added
@@ -226,18 +238,6 @@ traversal functions.
 Notable restrictions for paths are they require map-like keys to be strings or
 binaries. No provision is made for the usual optic options, instead traversal
 is always lax and creation is never done.
-
-
-## Modules ##
-
-<table width="100%" border="0" summary="list of modules">
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_path.md" class="module">optic_path</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
 
 
 ### Contributing ###
