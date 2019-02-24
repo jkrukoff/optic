@@ -18,9 +18,6 @@ new_test_() ->
     [?_assert(is_tuple(optic:new(Fold))),
      ?_assert(is_tuple(optic:new(Fold, Fold)))].
 
-from_test() ->
-    ?assert(is_tuple(optic:from([id(), id()]))).
-
 '%extend_test_'() ->
     New = fun (_Data, _Template) -> undefined end,
     [?_assert(is_tuple(optic:'%extend'(id(), #{}, New))),
