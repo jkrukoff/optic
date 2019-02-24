@@ -31,6 +31,10 @@
 -type callback_filter() :: fun((Elem :: term()) -> boolean()).
 %% Callback function invoked by filter optics for each element of a
 %% container.
+-type callback_new() :: fun((Data :: term(),
+                          Template :: term()) ->
+                         NewData :: term()).
+%% Callback function invoked to create new containers.
 -type optic_fold() :: fun((Fold :: callback_fold(),
                            Acc :: term(),
                            Data :: term()) ->
@@ -41,10 +45,10 @@
                               Data :: term()) ->
                              option({NewData :: term(), NewAcc :: term()})).
 %% A mapfold function to be used as part of an optic.
--type optic_new() :: fun((Data :: term(),
-                          Template :: term()) ->
-                         NewData :: term()).
-%% An internal interface for creating new containers.
+-type optic_wrap(Over) :: fun((Over) -> Over).
+%% A mapping function to wrap optics.
+-type optic_wrap_fold() :: optic_wrap(optic_fold()).
+-type optic_wrap_mapfold() :: optic_wrap(optic_mapfold()).
 
 -type extend_options() :: #{create=>term(),
                             strict=>boolean(),
@@ -69,7 +73,11 @@
          get/2,
          mapfold/4,
          map/3,
-         put/3]).
+         put/3,
+         % Optics.
+         id/0,
+         create/3,
+         lax/1]).
 
 -export_type([callback_map/0,
               callback_fold/0,
@@ -77,6 +85,8 @@
               callback_filter/0,
               optic_fold/0,
               optic_mapfold/0,
+              optic_wrap_fold/0,
+              optic_wrap_mapfold/0,
               extend_options/0,
               optic/0,
               optics/0]).
@@ -158,6 +168,14 @@ new(MapFold) ->
 new(MapFold, Fold) ->
     #optic{fold=Fold, mapfold=MapFold}.
 
+-spec wrap(Optic :: optic(),
+           WrapMapFold :: optic_wrap_mapfold(),
+           WrapFold :: optic_wrap_fold()) -> optic().
+wrap(#optic{fold=Fold, mapfold=MapFold}, WrapMapFold, WrapFold) ->
+    NewMapFold = WrapMapFold(MapFold),
+    NewFold = WrapFold(Fold),
+    new(NewMapFold, NewFold).
+
 -spec chain(Optics :: optics()) -> optic().
 chain(#optic{} = Optic) ->
     Optic;
@@ -196,7 +214,7 @@ merge([Head | Tail]) ->
 %% perform the creation.
 %% @end
 %% @returns An opaque optic record.
--spec '%extend'(Optic :: optic(), Options :: extend_options(), New :: optic_new()) -> optic().
+-spec '%extend'(Optic :: optic(), Options :: extend_options(), New :: callback_new()) -> optic().
 '%extend'(#optic{} = Optic, Options, New) when is_list(Options) ->
  % Normalize proplist option form to map form.
  Strict = proplists:get_bool(strict, Options),
@@ -357,6 +375,59 @@ put(Optics, Data, Value) ->
     map(Optics, Data, fun (_) -> Value end).
 
 %%%===================================================================
+%%% API - Optics
+%%%===================================================================
+
+-spec id() -> optic().
+id() ->
+    Fold = fun (Fun, Acc, Data) ->
+        {ok, Fun(Data, Acc)}
+    end,
+    new(Fold, Fold).
+
+-spec create(optic(), callback_new(), term()) -> optic().
+create(Optic, New, Template) ->
+    WrapFold = fun (Fold) -> Fold end,
+    WrapMapFold =
+    fun (MapFold) ->
+            fun (Fun, Acc, Data) ->
+                    case MapFold(Fun, Acc, Data) of
+                        {error, undefined} ->
+                            MapFold(Fun, Acc, New(Data, Template));
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    optic:wrap(Optic, WrapMapFold, WrapFold).
+
+-spec lax(optic()) -> optic().
+lax(Optic) ->
+    WrapFold =
+    fun (Fold) ->
+            fun (Fun, Acc, Data) ->
+                    case Fold(Fun, Acc, Data) of
+                        {error, undefined} ->
+                            {ok, Acc};
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    WrapMapFold =
+    fun (MapFold) ->
+            fun (Fun, Acc, Data) ->
+                    case MapFold(Fun, Acc, Data) of
+                        {error, undefined} ->
+                            {ok, {Data, Acc}};
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    wrap(Optic, WrapMapFold, WrapFold).
+
+%%%===================================================================
 %%% Internal Functions
 %%%===================================================================
 
@@ -429,7 +500,7 @@ product(#optic{fold=Fold1, mapfold=MapFold1},
 
 extend_create(#optic{fold=Fold, mapfold=MapFold}, New, Template) ->
     NewMapFold =
-    fun(Fun, Acc, Data) ->
+    fun (Fun, Acc, Data) ->
             case MapFold(Fun, Acc, Data) of
                 {error, undefined} ->
                     MapFold(Fun, Acc, New(Data, Template));
@@ -441,7 +512,7 @@ extend_create(#optic{fold=Fold, mapfold=MapFold}, New, Template) ->
 
 extend_filter(#optic{fold=Fold, mapfold=MapFold}, Filter) ->
     FilterFold =
-    fun(Fun, Acc, Data) ->
+    fun (Fun, Acc, Data) ->
             Fold(fun (Elem, InnerAcc) ->
                          case Filter(Elem) of
                              true ->
@@ -454,7 +525,7 @@ extend_filter(#optic{fold=Fold, mapfold=MapFold}, Filter) ->
                  Data)
     end,
     FilterMapFold =
-    fun(Fun, Acc, Data) ->
+    fun (Fun, Acc, Data) ->
             MapFold(fun (Elem, InnerAcc) ->
                             case Filter(Elem) of
                                 true ->
@@ -470,7 +541,7 @@ extend_filter(#optic{fold=Fold, mapfold=MapFold}, Filter) ->
 
 extend_lax(#optic{fold=Fold, mapfold=MapFold}) ->
     LaxFold =
-    fun(Fun, Acc, Data) ->
+    fun (Fun, Acc, Data) ->
             case Fold(Fun, Acc, Data) of
                 {error, undefined} ->
                     {ok, Acc};
@@ -479,7 +550,7 @@ extend_lax(#optic{fold=Fold, mapfold=MapFold}) ->
             end
     end,
     LaxMapFold =
-    fun(Fun, Acc, Data) ->
+    fun (Fun, Acc, Data) ->
             case MapFold(Fun, Acc, Data) of
                 {error, undefined} ->
                     {ok, {Data, Acc}};
