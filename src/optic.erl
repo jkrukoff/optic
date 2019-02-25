@@ -251,7 +251,7 @@ wrap(#optic{fold=Fold, mapfold=MapFold}, WrapMapFold, WrapFold) ->
 %% of this composition is itself an optic.
 %%
 %% This is the default composition method used for functions which
-%% accept optics. It is the optic sum type.
+%% accept optics.
 %% @end
 %% @param Optics The list of optics to compose.
 %% @returns An opaque optic record.
@@ -261,7 +261,7 @@ chain(#optic{} = Optic) ->
 chain([]) ->
     id();
 chain([Head | Tail]) ->
-    lists:foldl(fun sum/2, Head, Tail).
+    lists:foldl(fun compose/2, Head, Tail).
 
 %% @doc
 %% Merge existing optics into a single optic. In left to right order,
@@ -698,8 +698,8 @@ require(Filter) ->
 %%% Internal Functions
 %%%===================================================================
 
-sum(#optic{fold=Fold1, mapfold=MapFold1},
-    #optic{fold=Fold2, mapfold=MapFold2}) ->
+compose(#optic{fold=Fold1, mapfold=MapFold1},
+        #optic{fold=Fold2, mapfold=MapFold2}) ->
     Fold =
     fun (Fun, Acc, Data) ->
             case Fold2(

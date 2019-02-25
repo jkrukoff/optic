@@ -255,7 +255,7 @@ optic then focuses on the result of the previous optic. The result
 of this composition is itself an optic.
 
 This is the default composition method used for functions which
-accept optics. It is the optic sum type.
+accept optics.
 
 <a name="create-3"></a>
 
