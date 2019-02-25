@@ -40,7 +40,7 @@ __See also:__ [values/1](#values-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -62,7 +62,7 @@ __See also:__ [key/2](#key-2).
 ### key/2 ###
 
 <pre><code>
-key(Key::term(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+key(Key::term(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -97,7 +97,7 @@ __See also:__ [keys/1](#keys-1).
 ### keys/1 ###
 
 <pre><code>
-keys(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+keys(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -131,7 +131,7 @@ __See also:__ [properties/1](#properties-1).
 ### properties/1 ###
 
 <pre><code>
-properties(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+properties(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -166,7 +166,7 @@ __See also:__ [property/2](#property-2).
 ### property/2 ###
 
 <pre><code>
-property(Key::term(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+property(Key::term(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -202,7 +202,7 @@ __See also:__ [values/1](#values-1).
 ### values/1 ###
 
 <pre><code>
-values(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+values(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 

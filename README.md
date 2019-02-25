@@ -2,14 +2,14 @@
 
 ![Camera Lenses](doc/lenses.jpg)
 
+
 ### Overview ###
 
 This is an Erlang/OTP library for retrieving and modifying nested values, in
-the spirit of [Haskell's lens
-library](https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references).
-Functional selectors for deeply nested values are constructed by composing
-"optics", each of which specifies a way to focus on a particular kind of
-value.
+the spirit of [Haskell's
+lens library](https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references). Functional selectors for deeply nested values are
+constructed by composing "optics", each of which specifies a way to focus on a
+particular kind of value.
 
 For example, say we had a list of deserialized JSON entities representing pets
 for sale that we wanted to modify.
@@ -45,13 +45,13 @@ We could then update all pets to a new status by:
 ## Modules ##
 
 <table width="100%" border="0" summary="list of modules">
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_path.md" class="module">optic_path</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_path.md" class="module">optic_path</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
 
 
 ### Getting Started ###
@@ -110,6 +110,13 @@ take a single arbitrary element and return a boolean true/false. If the
 criteria the filter function uses to select an element is modified, the
 filtered optic will no longer be well behaved.
 
+* require: When given, expects a value as a filter function to determine if
+the traversed element can be focused. If the element can not be focused,
+`{error, required}` will be returned. The filter function should take a single
+arbitrary element and return a boolean true/false. If the criteria the filter
+function uses to select an element is modified, the filtered optic will no
+longer be well behaved.
+
 
 #### Examples ####
 
@@ -117,7 +124,6 @@ Let's look at some examples of how optics can be used. We'll start with a list
 of maps and demonstrate various ways it can be processed:
 
 ```
-
 > Data = [#{name => first}, #{name => second}, #{name => third}].
 ```
 
@@ -126,7 +132,6 @@ head of the list, and combine it with an optic to extract the value of the
 "name" key from the map.
 
 ```
-
 > optic:get([optic_lists:head(), optic_maps:key(name)], Data).
 {ok,[first]}
 ```
@@ -141,12 +146,12 @@ change the list optic used to do so:
 {ok,[first,second,third]}
 ```
 
-Optics can also be composed using `optic:from/1` in order to select
+Optics can also be composed using `optic:merge/1` in order to select
 multiple elements at the same level. For instance, to select only the first
 two maps, we could do this:
 
 ```
-> FirstTwo = optic:from([optic_lists:nth(1), optic_lists:nth(2)]),
+> FirstTwo = optic:merge([optic_lists:nth(1), optic_lists:nth(2)]),
 > optic:get([FirstTwo, optic_maps:key(name)], Data).
 {ok,[first,second]}
 ```
@@ -261,10 +266,11 @@ appreciated.
 
 ### Lineage ###
 
-I first encountered lenses via the [Datum](https://github.com/fogfish/datum)
-library, but wanted a version that supported traversables instead of lenses in
-order to support updating multiple elements. As lenses are a special case of
-traversables, this allowed for using a single type to represent both.
+I first encountered lenses via the
+[Datum](https://github.com/fogfish/datum) library, but wanted a
+version that supported traversables instead of lenses in order to support
+updating multiple elements. As lenses are a special case of traversables, this
+allowed for using a single type to represent both.
 
 There are a number of good introductions to lenses,
 [this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
@@ -273,12 +279,6 @@ was the most accessible for me.
 This library was initially conceived with the intention of making it easy to
 modify deeply nested JSON, so JSON related data structures were the first
 implemented.
-
-Several generic transformations are possible on optics, but the required
-expectations are not always obvious or possible to enforce. As such, the
-choice was made to privilege the optics created by the library to allow for
-easily creating variations, since those could be expected to be implemented
-consistently.
 
 
 ### Attribution ###

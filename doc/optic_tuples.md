@@ -38,7 +38,7 @@ __See also:__ [all/1](#all-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -71,7 +71,7 @@ __See also:__ [element/2](#element-2).
 ### element/2 ###
 
 <pre><code>
-element(N::pos_integer(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+element(N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -105,7 +105,7 @@ __See also:__ [field/4](#field-4).
 ### field/4 ###
 
 <pre><code>
-field(Tag::atom(), Size::pos_integer(), N::pos_integer(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+field(Tag::atom(), Size::pos_integer(), N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 

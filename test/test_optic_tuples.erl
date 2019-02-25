@@ -60,46 +60,53 @@ element_create_test_() ->
 
 field_get_test_() ->
     [?_assertEqual({ok, [1]},
-                   optic:get([optic_tuples:field(test_optic_tuples,
-                                                 record_info(size, test_optic_tuples),
-                                                 #test_optic_tuples.one,
-                                                 [strict])],
+                   optic:get([optic_tuples:field(
+                                test_optic_tuples,
+                                record_info(size, test_optic_tuples),
+                                #test_optic_tuples.one,
+                                [strict])],
                              #test_optic_tuples{})),
      ?_assertEqual({ok, [1]},
-                   optic:get([optic_tuples:field(?OPTIC_FIELD(test_optic_tuples, one))],
+                   optic:get([optic_tuples:field(
+                                ?OPTIC_FIELD(test_optic_tuples, one))],
                              #test_optic_tuples{})),
      ?_assertEqual({error, undefined},
-                   optic:get([optic_tuples:field(test_optic_tuples,
-                                                 record_info(size, test_optic_tuples),
-                                                 #test_optic_tuples.one,
-                                                 [strict])],
+                   optic:get([optic_tuples:field(
+                                test_optic_tuples,
+                                record_info(size, test_optic_tuples),
+                                #test_optic_tuples.one,
+                                [strict])],
                              {test_optic_tuples}))].
 
 field_put_test_() ->
     [?_assertEqual({ok, {test_optic_tuples, 4, 2, 3}},
-                   optic:put([optic_tuples:field(test_optic_tuples,
-                                                 record_info(size, test_optic_tuples),
-                                                 #test_optic_tuples.one,
-                                                 [strict])],
+                   optic:put([optic_tuples:field(
+                                test_optic_tuples,
+                                record_info(size, test_optic_tuples),
+                                #test_optic_tuples.one,
+                                [strict])],
                              #test_optic_tuples{},
                              4)),
      ?_assertEqual({ok, {test_optic_tuples, 4, 2, 3}},
-                   optic:put([optic_tuples:field(?OPTIC_FIELD(test_optic_tuples, one))],
+                   optic:put([optic_tuples:field(
+                                ?OPTIC_FIELD(test_optic_tuples, one))],
                              #test_optic_tuples{},
                              4)),
      ?_assertEqual({error, undefined},
-                   optic:put([optic_tuples:field(test_optic_tuples,
-                                                 record_info(size, test_optic_tuples),
-                                                 #test_optic_tuples.one,
-                                                 [strict])],
+                   optic:put([optic_tuples:field(
+                                test_optic_tuples,
+                                record_info(size, test_optic_tuples),
+                                #test_optic_tuples.one,
+                                [strict])],
                              {test_optic_tuples},
                              4))].
 
 field_create_test() ->
     ?assertEqual({ok, {test_optic_tuples, 4, undefined, undefined}},
-                   optic:put([optic_tuples:field(test_optic_tuples,
-                                                 record_info(size, test_optic_tuples),
-                                                 #test_optic_tuples.one,
-                                                 [strict, {create, undefined}])],
-                             {test_optic_tuples},
-                             4)).
+                 optic:put([optic_tuples:field(
+                              test_optic_tuples,
+                              record_info(size, test_optic_tuples),
+                              #test_optic_tuples.one,
+                              [strict, {create, undefined}])],
+                           {test_optic_tuples},
+                           4)).

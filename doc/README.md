@@ -4,7 +4,7 @@
 
 Copyright (c) 2019 John Krukoff
 
-__Version:__ 1.0.0
+__Version:__ 2.0.0
 
 __Authors:__ John Krukoff ([`github@cultist.org`](mailto:github@cultist.org)).
 
@@ -109,6 +109,13 @@ take a single arbitrary element and return a boolean true/false. If the
 criteria the filter function uses to select an element is modified, the
 filtered optic will no longer be well behaved.
 
+* require: When given, expects a value as a filter function to determine if
+the traversed element can be focused. If the element can not be focused,
+`{error, required}` will be returned. The filter function should take a single
+arbitrary element and return a boolean true/false. If the criteria the filter
+function uses to select an element is modified, the filtered optic will no
+longer be well behaved.
+
 
 
 #### Examples ####
@@ -142,13 +149,13 @@ change the list optic used to do so:
 {ok,[first,second,third]}
 ```
 
-Optics can also be composed using `optic:from/1` in order to select
+Optics can also be composed using `optic:merge/1` in order to select
 multiple elements at the same level. For instance, to select only the first
 two maps, we could do this:
 
 ```
 
-> FirstTwo = optic:from([optic_lists:nth(1), optic_lists:nth(2)]),
+> FirstTwo = optic:merge([optic_lists:nth(1), optic_lists:nth(2)]),
 > optic:get([FirstTwo, optic_maps:key(name)], Data).
 {ok,[first,second]}
 ```
@@ -270,23 +277,19 @@ appreciated.
 
 ### Lineage ###
 
-I first encountered lenses via the[Datum](https://github.com/fogfish/datum) library, but wanted a
+I first encountered lenses via the
+[Datum](https://github.com/fogfish/datum) library, but wanted a
 version that supported traversables instead of lenses in order to support
 updating multiple elements. As lenses are a special case of traversables, this
 allowed for using a single type to represent both.
 
-There are a number of good introductions to lenses, [this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
+There are a number of good introductions to lenses,
+[this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
 was the most accessible for me.
 
 This library was initially conceived with the intention of making it easy to
 modify deeply nested JSON, so JSON related data structures were the first
 implemented.
-
-Several generic transformations are possible on optics, but the required
-expectations are not always obvious or possible to enforce. As such, the
-choice was made to privilege the optics created by the library to allow for
-easily creating variations, since those could be expected to be implemented
-consistently.
 
 
 ### Attribution ###

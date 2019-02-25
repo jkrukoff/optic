@@ -29,7 +29,7 @@ all() ->
     values().
 
 %% @see values/1
--spec all(optic:extend_options()) -> optic:optic().
+-spec all(optic:variations()) -> optic:optic().
 all(Options) ->
     values(Options).
 
@@ -50,32 +50,35 @@ keys() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec keys(optic:extend_options()) -> optic:optic().
+-spec keys(optic:variations()) -> optic:optic().
 keys(Options) ->
-    Fold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (Key, _Value, InnerAcc) ->
-                           Fun(Key, InnerAcc)
-                       end,
-                       Acc,
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (Key, _Value, InnerAcc) ->
+                                   Fun(Key, InnerAcc)
+                           end,
+                           Acc,
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
-                           {NewKey, NewAcc} = Fun(Key, InnerAcc),
-                           {InnerMap#{NewKey=>Value}, NewAcc}
-                       end,
-                       {#{}, Acc},
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
+                                   {NewKey, NewAcc} = Fun(Key, InnerAcc),
+                                   {InnerMap#{NewKey=>Value}, NewAcc}
+                           end,
+                           {#{}, Acc},
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        #{}
+    New =
+    fun (_Data, _Template) ->
+            #{}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see values/1
 -spec values() -> optic:optic().
@@ -94,32 +97,35 @@ values() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec values(optic:extend_options()) -> optic:optic().
+-spec values(optic:variations()) -> optic:optic().
 values(Options) ->
-    Fold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (_Key, Value, InnerAcc) ->
-                           Fun(Value, InnerAcc)
-                       end,
-                       Acc,
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (_Key, Value, InnerAcc) ->
+                                   Fun(Value, InnerAcc)
+                           end,
+                           Acc,
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
-                           {NewValue, NewAcc} = Fun(Value, InnerAcc),
-                           {InnerMap#{Key=>NewValue}, NewAcc}
-                       end,
-                       {#{}, Acc},
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
+                                   {NewValue, NewAcc} = Fun(Value, InnerAcc),
+                                   {InnerMap#{Key=>NewValue}, NewAcc}
+                           end,
+                           {#{}, Acc},
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        #{}
+    New =
+    fun (_Data, _Template) ->
+            #{}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see associations/1
 -spec associations() -> optic:optic().
@@ -139,32 +145,35 @@ associations() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec associations(optic:extend_options()) -> optic:optic().
+-spec associations(optic:variations()) -> optic:optic().
 associations(Options) ->
-    Fold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (Key, Value, InnerAcc) ->
-                           Fun({Key, Value}, InnerAcc)
-                       end,
-                       Acc,
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (Key, Value, InnerAcc) ->
+                                   Fun({Key, Value}, InnerAcc)
+                           end,
+                           Acc,
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Map) when is_map(Map) ->
-        {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
-                           {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, InnerAcc),
-                           {InnerMap#{NewKey=>NewValue}, NewAcc}
-                       end,
-                       {#{}, Acc},
-                       Map)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Map) when is_map(Map) ->
+            {ok, maps:fold(fun (Key, Value, {InnerMap, InnerAcc}) ->
+                                   {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, InnerAcc),
+                                   {InnerMap#{NewKey=>NewValue}, NewAcc}
+                           end,
+                           {#{}, Acc},
+                           Map)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        #{}
+    New =
+    fun (_Data, _Template) ->
+            #{}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see key/2
 -spec key(term()) -> optic:optic().
@@ -184,26 +193,29 @@ key(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec key(term(), optic:extend_options()) -> optic:optic().
+-spec key(term(), optic:variations()) -> optic:optic().
 key(Key, Options) ->
-    Fold = fun (Fun, Acc, #{Key:=Value}) ->
-        {ok, Fun(Value, Acc)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, #{Key:=Value}) ->
+            {ok, Fun(Value, Acc)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, #{Key:=Value} = Map) when is_map(Map) ->
-        {NewValue, NewAcc} = Fun(Value, Acc),
-        {ok, {Map#{Key:=NewValue}, NewAcc}};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, #{Key:=Value} = Map) when is_map(Map) ->
+            {NewValue, NewAcc} = Fun(Value, Acc),
+            {ok, {Map#{Key:=NewValue}, NewAcc}};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (Map, Template) when is_map(Map) ->
-        Map#{Key=>Template};
-    (_Data, Template) ->
-        #{Key=>Template}
+    New =
+    fun (Map, Template) when is_map(Map) ->
+            Map#{Key=>Template};
+        (_Data, Template) ->
+            #{Key=>Template}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see association/2
 -spec association(term()) -> optic:optic().
@@ -225,23 +237,26 @@ association(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec association(term(), optic:extend_options()) -> optic:optic().
+-spec association(term(), optic:variations()) -> optic:optic().
 association(Key, Options) ->
-    Fold = fun (Fun, Acc, #{Key:=Value}) ->
-        {ok, Fun({Key, Value}, Acc)};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, #{Key:=Value}) ->
+            {ok, Fun({Key, Value}, Acc)};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, #{Key:=Value} = Map) when is_map(Map) ->
-        {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, Acc),
-        {ok, {(maps:remove(Key, Map))#{NewKey=>NewValue}, NewAcc}};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, #{Key:=Value} = Map) when is_map(Map) ->
+            {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, Acc),
+            {ok, {(maps:remove(Key, Map))#{NewKey=>NewValue}, NewAcc}};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (Map, Template) when is_map(Map) ->
-        Map#{Key=>Template};
-    (_Data, Template) ->
-        #{Key=>Template}
+    New =
+    fun (Map, Template) when is_map(Map) ->
+            Map#{Key=>Template};
+        (_Data, Template) ->
+            #{Key=>Template}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).

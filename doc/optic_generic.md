@@ -15,15 +15,14 @@ types.
 Intended both as a convenience and to support optic creation from
 parsed paths in optic_path.
 
-Because of the ambiguis types they support, these optics do not
+Because of the ambiguous types they support, these optics do not
 support the standard optic options. Instead, they always skip
 unexpected types and never create missing values.<a name="index"></a>
 
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#id-0">id/0</a></td><td>
-The identity optic, focuses on what was given.</td></tr><tr><td valign="top"><a href="#index-1">index/1</a></td><td>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#index-1">index/1</a></td><td>
 Focus on an element of a list like container.</td></tr><tr><td valign="top"><a href="#key-1">key/1</a></td><td>
 Focus on the value of many different key/value like mappings.</td></tr></table>
 
@@ -31,26 +30,6 @@ Focus on the value of many different key/value like mappings.</td></tr></table>
 <a name="functions"></a>
 
 ## Function Details ##
-
-<a name="id-0"></a>
-
-### id/0 ###
-
-<pre><code>
-id() -&gt; <a href="optic.md#type-optic">optic:optic()</a>
-</code></pre>
-<br />
-
-returns: An opaque optic record.
-
-The identity optic, focuses on what was given.
-
-Example:
-
-```
-  > optic:get([optic_generic:id()], [1,2,3]).
-  {ok,[[1,2,3]]}
-```
 
 <a name="index-1"></a>
 

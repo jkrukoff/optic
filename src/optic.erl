@@ -1,10 +1,21 @@
 %%%-------------------------------------------------------------------
 %%% @doc
 %%% A library for creating "optics", a composable traversal over
-%%% arbitrary containers.
+%%% arbitrary containers with the possibility of error.
+%%%
+%%% The traversal is modeled as an opaque type containing both a fold
+%%% and mapfold type. As mapfold is a superset of fold, fold is
+%%% implemented for efficiency only. The usual fold and mapfold return
+%%% types are wrapped in ok/error tuples to represent the possibility
+%%% of failure, with the provided compositions being responsible for
+%%% propagating errors back out and skipping further execution.
 %%%
 %%% These optics can then be composed to read and update nested data
-%%% structures.
+%%% structures. Three types of composition are possible. A wrap, which
+%%% modifies an existing optic into a new form. A chain, which
+%%% combines two optics so that one focuses on the value the previous
+%%% focuses on. Finally, a merge, which combines two optics to allow
+%%% both to focus over the same data.
 %%% @end
 %%%-------------------------------------------------------------------
 -module(optic).
@@ -71,7 +82,10 @@
          wrap/3,
          chain/1,
          merge/1,
+         is_optic/1,
          variations/3,
+         create/3,
+         lax/1,
          % Optic application.
          fold/4,
          get/2,
@@ -82,11 +96,10 @@
          id/0,
          error/1,
          filter/1,
-         require/1,
-         create/3,
-         lax/1]).
+         require/1]).
 
--export_type([callback_map/0,
+-export_type([option/1,
+              callback_map/0,
               callback_fold/0,
               callback_mapfold/0,
               callback_filter/0,
@@ -175,6 +188,14 @@ new(MapFold) ->
 new(MapFold, Fold) ->
     #optic{fold=Fold, mapfold=MapFold}.
 
+%% @doc
+%% Wrap an existing optic.
+%%
+%% This is the less efficient form of optic construction and will
+%% infer a fold wrapper from the given mapfold wrapper.
+%% @end
+%% @returns An opaque optic record.
+%% @see wrap/3
 -spec wrap(Optic :: optic(),
            WrapMapFold :: optic_wrap_mapfold()) -> optic().
 wrap(#optic{} = Optic, WrapMapFold) ->
@@ -193,7 +214,7 @@ wrap(#optic{} = Optic, WrapMapFold) ->
             fun (Fun, Acc, Data) ->
                     case WrappedMapFold(Fun, Acc, Data) of
                         {ok, {_NewData, NewAcc}} ->
-                            NewAcc;
+                            {ok, NewAcc};
                         {error, _} = Error ->
                             Error
                     end
@@ -201,6 +222,21 @@ wrap(#optic{} = Optic, WrapMapFold) ->
     end,
     wrap(Optic, WrapMapFold, WrapFold).
 
+%% @doc
+%% Wrap an existing optic.
+%%
+%% This allows for modifying or replacing the methods of an existing
+%% optic by applying a mapping function to each of the mapfold and
+%% fold methods.
+%% @end
+%% @param Optic An existing optic to modify.
+%% @param WrapMapFold 
+%% A mapping function to apply to the optic's mapfold function.
+%% @end
+%% @param WrapFold 
+%% A mapping function to apply to the optic's fold function.
+%% @end
+%% @returns An opaque optic record.
 -spec wrap(Optic :: optic(),
            WrapMapFold :: optic_wrap_mapfold(),
            WrapFold :: optic_wrap_fold()) -> optic().
@@ -209,21 +245,51 @@ wrap(#optic{fold=Fold, mapfold=MapFold}, WrapMapFold, WrapFold) ->
     NewFold = WrapFold(Fold),
     new(NewMapFold, NewFold).
 
+%% @doc
+%% Combine existing optics into a chain. In left to right order, each
+%% optic then focuses on the result of the previous optic. The result
+%% of this composition is itself an optic.
+%%
+%% This is the default composition method used for functions which
+%% accept optics. It is the optic sum type.
+%% @end
+%% @param Optics The list of optics to compose.
+%% @returns An opaque optic record.
 -spec chain(Optics :: optics()) -> optic().
 chain(#optic{} = Optic) ->
     Optic;
 chain([]) ->
-    optic_generic:id();
+    id();
 chain([Head | Tail]) ->
     lists:foldl(fun sum/2, Head, Tail).
 
+%% @doc
+%% Merge existing optics into a single optic. In left to right order,
+%% each optic focuses on the same data. The result of this composition
+%% is itself an optic.
+%%
+%% It is the optic product type.
+%% @end
+%% @param Optics The list of optics to compose.
+%% @returns An opaque optic record.
 -spec merge(Optics :: optics()) -> optic().
 merge(#optic{} = Optic) ->
     Optic;
 merge([]) ->
-    optic_generic:id();
+    id();
 merge([Head | Tail]) ->
     lists:foldl(fun product/2, Head, Tail).
+
+%% @doc
+%% Check if a term is an optic.
+%% @end
+%% @param Candidate The term to test.
+%% @returns A boolean flag.
+-spec is_optic(Candidate :: term()) -> boolean().
+is_optic(#optic{}) ->
+    true;
+is_optic(_) ->
+    false.
 
 %% @private
 %% @doc
@@ -233,20 +299,27 @@ merge([Head | Tail]) ->
 %% restrictions this places on optic behaviour it is intended only for
 %% internal use.
 %%
-%% Optics with the create option enabled are not well behaved, and may
-%% exhibit unexpected behaviour when composed.
+%% Optics with the "create" option enabled are not well behaved, and
+%% may exhibit unexpected behaviour when composed. It is also possible
+%% for "filter" and "require" to no longer be well behaved, depending
+%% on the filter function used.
 %% @end
 %% @param Optic The base optic to modify.
 %% @param Options
 %% The selected options. Expected options are a boolean "strict" for
 %% if type errors should be reported or ignored, an arbitrarily valued
-%% "create" for if type errors should force container creation, and a
-%% "filter" function to restrict the elements selected.
+%% "create" for if type errors should force container creation, a
+%% "filter" function to restrict the elements selected and a "require"
+%% function to error when requirements are not met.
 %% @param New
 %% When the "create" option is selected, the function to invoke to
 %% perform the creation.
 %% @end
 %% @returns An opaque optic record.
+%% @see create/3
+%% @see filter/1
+%% @see lax/1
+%% @see require/1
 -spec variations(Optic :: optic(), Options :: variations(), New :: callback_new()) -> optic().
 variations(#optic{} = Optic, Options, New) when is_list(Options) ->
     % Normalize proplist option form to map form.
@@ -288,7 +361,7 @@ variations(#optic{} = Optic, #{} = Options, New) ->
         undefined ->
             LaxOptic;
         Require when is_function(Require) ->
-            chain([require(Require), LaxOptic]);
+            chain([LaxOptic, require(Require)]);
         InvalidRequire ->
             erlang:error({invalid_require_value, InvalidRequire})
     end,
@@ -297,11 +370,80 @@ variations(#optic{} = Optic, #{} = Options, New) ->
         undefined ->
             RequireOptic;
         Filter when is_function(Filter) ->
-            chain([filter(Filter), RequireOptic]);
+            chain([RequireOptic, filter(Filter)]);
         InvalidFilter ->
             erlang:error({invalid_filter_value, InvalidFilter})
     end,
     FilterOptic.
+
+%% @doc
+%% Wrap an existing optic to cause it to create a new container when
+%% the optic would otherwise return `{error, undefined}' or
+%% `{error, required}' during a mapfold operation.
+%% @end
+%% @param Optic The existing optic to wrap.
+%% @param New 
+%% The callback function to apply when the mapfold fails.
+%% Must take two arguments, the existing data and a template argument
+%% to use to populate the new data. Should return the new container,
+%% which will immediately have the wrapped mapfold function re-applied
+%% after creation.
+%% @end
+%% @param Template 
+%% The template value to be given to the callback function.
+%% @end
+%% @returns An opaque optic record.
+-spec create(Optic :: optic(), New :: callback_new(), Template :: term()) -> optic().
+create(Optic, New, Template) ->
+    WrapFold = fun (Fold) -> Fold end,
+    WrapMapFold =
+    fun (MapFold) ->
+            fun (Fun, Acc, Data) ->
+                    case MapFold(Fun, Acc, Data) of
+                        {error, Reason} when Reason == undefined;
+                                             Reason == required ->
+                            MapFold(Fun, Acc, New(Data, Template));
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    optic:wrap(Optic, WrapMapFold, WrapFold).
+
+%% @doc
+%% Wrap an existing optic to cause it to skip an element when the
+%% optic would otherwise return `{error, undefined}' or 
+%% `{error, required}' during a fold or mapfold operation.
+%% @end
+%% @param Optic The existing optic to wrap.
+%% @returns An opaque optic record.
+-spec lax(optic()) -> optic().
+lax(Optic) ->
+    WrapFold =
+    fun (Fold) ->
+            fun (Fun, Acc, Data) ->
+                    case Fold(Fun, Acc, Data) of
+                        {error, Reason} when Reason == undefined;
+                                             Reason == required ->
+                            {ok, Acc};
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    WrapMapFold =
+    fun (MapFold) ->
+            fun (Fun, Acc, Data) ->
+                    case MapFold(Fun, Acc, Data) of
+                        {error, Reason} when Reason == undefined;
+                                             Reason == required ->
+                            {ok, {Data, Acc}};
+                        Result ->
+                            Result
+                    end
+            end
+    end,
+    wrap(Optic, WrapMapFold, WrapFold).
 
 %%%===================================================================
 %%% API - Optic Application
@@ -424,6 +566,20 @@ put(Optics, Data, Value) ->
 %%% API - Optics
 %%%===================================================================
 
+%% @doc
+%% Focus on what was given.
+%%
+%% This is the identity optic, it can be chained with any other optic
+%% and will return the same optic.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic:id()], anything).
+%% {ok,[anything]}
+%% '''
+%% @end
+%% @returns An opaque optic record.
 -spec id() -> optic().
 id() ->
     Fold =
@@ -432,7 +588,19 @@ id() ->
     end,
     new(Fold, Fold).
 
--spec error(term()) -> optic:optic().
+%% @doc
+%% Always errors with the given reason.
+%%
+%% Example:
+%%
+%% ```
+%% > optic:get([optic:error(reason)], anything).
+%% {error, reason}
+%% '''
+%% @end
+%% @param Reason The error description to return.
+%% @returns An opaque optic record.
+-spec error(Reason :: term()) -> optic:optic().
 error(Reason) ->
     Fold =
     fun (_Fun, _Acc, _Data) ->
@@ -440,6 +608,27 @@ error(Reason) ->
     end,
     new(Fold, Fold).
 
+%% @doc
+%% Only focuses on the current data if the given filter function
+%% returns true. Otherwise the data is skipped.
+%%
+%% Can fail to be well behaved depending on if the filter criteria is
+%% part of the focus.
+%%
+%% Example:
+%%
+%% ```
+%% > IsOdd = fun (Elem) -> Elem % 2 == 1 end,
+%% > optic:get([optic:filter(IsOdd)], [1,2,3]).
+%% {ok, [1,3]}
+%% '''
+%% @end
+%% @param Filter
+%% The filter function to invoke to determine if the element should be
+%% focused. Takes the current data as an argument, returns a boolean
+%% true or false.
+%% @end
+%% @returns An opaque optic record.
 -spec filter(callback_filter()) -> optic:optic().
 filter(Filter) ->
     Fold =
@@ -462,6 +651,27 @@ filter(Filter) ->
     end,
     new(MapFold, Fold).
 
+%% @doc
+%% Only focuses on the current data if the given filter function
+%% returns true. Otherwise an `{error, required}` is returned.
+%%
+%% Can fail to be well behaved depending on if the filter criteria is
+%% part of the focus.
+%%
+%% Example:
+%%
+%% ```
+%% > IsOdd = fun (Elem) -> Elem % 2 == 1 end,
+%% > optic:get([optic:require(IsOdd)], [1,2,3]).
+%% {error, required}
+%% '''
+%% @end
+%% @param Filter
+%% The filter function to invoke to determine if the element should be
+%% focused. Takes the current data as an argument, returns a boolean
+%% true or false.
+%% @end
+%% @returns An opaque optic record.
 -spec require(callback_filter()) -> optic:optic().
 require(Filter) ->
     Fold =
@@ -483,48 +693,6 @@ require(Filter) ->
             end
     end,
     new(MapFold, Fold).
-
--spec create(optic(), callback_new(), term()) -> optic().
-create(Optic, New, Template) ->
-    WrapFold = fun (Fold) -> Fold end,
-    WrapMapFold =
-    fun (MapFold) ->
-            fun (Fun, Acc, Data) ->
-                    case MapFold(Fun, Acc, Data) of
-                        {error, undefined} ->
-                            MapFold(Fun, Acc, New(Data, Template));
-                        Result ->
-                            Result
-                    end
-            end
-    end,
-    optic:wrap(Optic, WrapMapFold, WrapFold).
-
--spec lax(optic()) -> optic().
-lax(Optic) ->
-    WrapFold =
-    fun (Fold) ->
-            fun (Fun, Acc, Data) ->
-                    case Fold(Fun, Acc, Data) of
-                        {error, undefined} ->
-                            {ok, Acc};
-                        Result ->
-                            Result
-                    end
-            end
-    end,
-    WrapMapFold =
-    fun (MapFold) ->
-            fun (Fun, Acc, Data) ->
-                    case MapFold(Fun, Acc, Data) of
-                        {error, undefined} ->
-                            {ok, {Data, Acc}};
-                        Result ->
-                            Result
-                    end
-            end
-    end,
-    wrap(Optic, WrapMapFold, WrapFold).
 
 %%%===================================================================
 %%% Internal Functions

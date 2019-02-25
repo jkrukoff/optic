@@ -39,7 +39,7 @@ __See also:__ [all/1](#all-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -72,7 +72,7 @@ __See also:__ [head/1](#head-1).
 ### head/1 ###
 
 <pre><code>
-head(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+head(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -106,7 +106,7 @@ __See also:__ [nth/2](#nth-2).
 ### nth/2 ###
 
 <pre><code>
-nth(N::pos_integer(), Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+nth(N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 
@@ -140,7 +140,7 @@ __See also:__ [tail/1](#tail-1).
 ### tail/1 ###
 
 <pre><code>
-tail(Options::<a href="optic.md#type-extend_options">optic:extend_options()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+tail(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
 <br />
 

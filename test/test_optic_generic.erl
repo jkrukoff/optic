@@ -11,14 +11,6 @@
 %%% Tests
 %%%===================================================================
 
-id_get_test() ->
-    ?assertEqual({ok, [atom]},
-                 optic:get([optic_generic:id()], atom)).
-
-id_put_test() ->
-    ?assertEqual({ok, new},
-                 optic:put([optic_generic:id()], atom, new)).
-
 key_get_test_() ->
     [?_assertEqual({ok, [value]},
                    optic:get([optic_generic:key(key)], #{key=>value})),

@@ -34,24 +34,27 @@ all() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec all(optic:extend_options()) -> optic:optic().
+-spec all(optic:variations()) -> optic:optic().
 all(Options) ->
-    Fold = fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
-        {ok, lists:foldl(Fun, Acc, tuple_to_list(Tuple))};
-    (_, _, _) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
+            {ok, lists:foldl(Fun, Acc, tuple_to_list(Tuple))};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
-        {NewList, NewAcc} = lists:mapfoldl(Fun, Acc, tuple_to_list(Tuple)),
-        {ok, {list_to_tuple(NewList), NewAcc}};
-    (_, _, _) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
+            {NewList, NewAcc} = lists:mapfoldl(Fun, Acc, tuple_to_list(Tuple)),
+            {ok, {list_to_tuple(NewList), NewAcc}};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        {}
+    New =
+    fun (_Data, _Template) ->
+            {}
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see element/2
 -spec element(pos_integer()) -> optic:optic().
@@ -72,29 +75,32 @@ element(N) ->
 %% @param N The index of the tuple element to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec element(pos_integer(), optic:extend_options()) -> optic:optic().
+-spec element(pos_integer(), optic:variations()) -> optic:optic().
 element(N, Options) ->
-    Fold = fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
-        Nth = erlang:element(N, Tuple),
-        {ok, Fun(Nth, Acc)};
-    (_, _, _) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
+            Nth = erlang:element(N, Tuple),
+            {ok, Fun(Nth, Acc)};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
-        Nth = erlang:element(N, Tuple),
-        {NewNth, NewAcc} = Fun(Nth, Acc),
-        {ok, {erlang:setelement(N, Tuple, NewNth), NewAcc}};
-    (_, _, _) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
+            Nth = erlang:element(N, Tuple),
+            {NewNth, NewAcc} = Fun(Nth, Acc),
+            {ok, {erlang:setelement(N, Tuple, NewNth), NewAcc}};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    New = fun (Tuple, Template) when is_tuple(Tuple) ->
-        list_to_tuple(tuple_to_list(Tuple) ++
-                      lists:duplicate(N - tuple_size(Tuple), Template));
-    (_Data, Template) ->
-        list_to_tuple(lists:duplicate(N, Template))
+    New =
+    fun (Tuple, Template) when is_tuple(Tuple) ->
+            list_to_tuple(tuple_to_list(Tuple) ++
+                          lists:duplicate(N - tuple_size(Tuple), Template));
+        (_Data, Template) ->
+            list_to_tuple(lists:duplicate(N, Template))
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see field/4
 -spec field(atom(), pos_integer(), pos_integer()) -> optic:optic().
@@ -126,29 +132,32 @@ field(Tag, Size, N) ->
 %% @param N The index of the field in the record tuple.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec field(atom(), pos_integer(), pos_integer(), optic:extend_options()) -> optic:optic().
+-spec field(atom(), pos_integer(), pos_integer(), optic:variations()) -> optic:optic().
 field(Tag, Size, N, Options) ->
-    Fold = fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,
-                                      Size == tuple_size(Tuple),
-                                      N > 1,
-                                      N =< tuple_size(Tuple) ->
-        Nth = erlang:element(N, Tuple),
-        {ok, Fun(Nth, Acc)};
-    (_, _, _) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,
+                               Size == tuple_size(Tuple),
+                               N > 1,
+                               N =< tuple_size(Tuple) ->
+            Nth = erlang:element(N, Tuple),
+            {ok, Fun(Nth, Acc)};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,
-                                         Size == tuple_size(Tuple),
-                                         N > 1,
-                                         N =< tuple_size(Tuple) ->
-        Nth = erlang:element(N, Tuple),
-        {NewNth, NewAcc} = Fun(Nth, Acc),
-        {ok, {erlang:setelement(N, Tuple, NewNth), NewAcc}};
-    (_, _, _) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,
+                               Size == tuple_size(Tuple),
+                               N > 1,
+                               N =< tuple_size(Tuple) ->
+            Nth = erlang:element(N, Tuple),
+            {NewNth, NewAcc} = Fun(Nth, Acc),
+            {ok, {erlang:setelement(N, Tuple, NewNth), NewAcc}};
+        (_, _, _) ->
+            {error, undefined}
     end,
-    New = fun (_Data, Template) ->
-        list_to_tuple([Tag] ++ lists:duplicate(Size - 1, Template))
+    New =
+    fun (_Data, Template) ->
+            list_to_tuple([Tag] ++ lists:duplicate(Size - 1, Template))
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).

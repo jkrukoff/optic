@@ -13,37 +13,62 @@
 
 new_test_() ->
     Fold = fun (Fun, Acc, Data) ->
-        {ok, Fun(Data, Acc)}
-    end,
-    [?_assert(is_tuple(optic:new(Fold))),
-     ?_assert(is_tuple(optic:new(Fold, Fold)))].
+                   {ok, Fun(Data, Acc)}
+           end,
+    [?_assert(optic:is_optic(optic:new(Fold))),
+     ?_assert(optic:is_optic(optic:new(Fold, Fold)))].
+
+wrap_test_() ->
+    Wrapped2 = optic:wrap(
+                 id(),
+                 fun (MapFold) ->
+                         MapFold
+                 end),
+    Wrapped3 = optic:wrap(
+                 id(),
+                 fun (MapFold) ->
+                         MapFold
+                 end,
+                 fun (Fold) ->
+                         Fold
+                 end),
+    [?_assert(optic:is_optic(Wrapped2)),
+     ?_assert(optic:is_optic(Wrapped3)),
+     ?_assertEqual({ok, [atom]},
+                   optic:get(Wrapped2, atom)),
+     ?_assertEqual({ok, modified},
+                   optic:put(Wrapped2, atom, modified)),
+     ?_assertEqual({ok, [atom]},
+                   optic:get(Wrapped3, atom)),
+     ?_assertEqual({ok, modified},
+                   optic:put(Wrapped3, atom, modified))].
 
 chain_test_() ->
-    [?_assert(is_tuple(optic:chain([id(), id(), id()]))),
+    [?_assert(optic:is_optic(optic:chain([id(), id(), id()]))),
      ?_assertEqual({ok, [atom]},
-                   optic:get([optic:chain([id()])],
+                   optic:get(optic:chain([id()]),
                              atom)),
      ?_assertEqual({ok, [atom]},
-                   optic:get([optic:chain([id(), id()])],
+                   optic:get(optic:chain([id(), id()]),
                              atom)),
      ?_assertEqual({ok, [atom]},
-                   optic:get([optic:chain([id(), id(), id()])],
+                   optic:get(optic:chain([id(), id(), id()]),
                              atom)),
      ?_assertEqual({ok, modified},
-                   optic:put([optic:chain([id()])],
+                   optic:put(optic:chain([id()]),
                              atom,
                              modified)),
      ?_assertEqual({ok, modified},
-                   optic:put([optic:chain([id(), id()])],
+                   optic:put(optic:chain([id(), id()]),
                              atom,
                              modified)),
      ?_assertEqual({ok, modified},
-                   optic:put([optic:chain([id(), id(), id()])],
+                   optic:put(optic:chain([id(), id(), id()]),
                              atom,
                              modified))].
 
 merge_test_() ->
-    [?_assert(is_tuple(optic:merge([id(), id(), id()]))),
+    [?_assert(optic:is_optic(optic:merge([id(), id(), id()]))),
      ?_assertEqual({ok, [atom]},
                    optic:get([optic:merge([id()])],
                              atom)),
@@ -66,20 +91,62 @@ merge_test_() ->
                              atom,
                              modified))].
 
-'%extend_test_'() ->
+is_optic_test_() ->
+    [?_assert(optic:is_optic(id())),
+     ?_assert(not optic:is_optic({}))].
+
+variations_test_() ->
     New = fun (_Data, _Template) -> undefined end,
-    [?_assert(is_tuple(optic:'%extend'(id(), #{}, New))),
-     ?_assert(is_tuple(optic:'%extend'(id(), #{strict=>false}, New))),
-     ?_assert(is_tuple(optic:'%extend'(id(), #{strict=>true}, New))),
-     ?_assert(is_tuple(optic:'%extend'(id(), #{create=>undefined}, New))),
-     ?_assertEqual(optic:'%extend'(id(), #{}, New),
-                   optic:'%extend'(id(), #{strict=>false}, New)),
-     ?_assertEqual(optic:'%extend'(id(), [], New),
-                   optic:'%extend'(id(), #{strict=>false}, New)),
-     ?_assertEqual(optic:'%extend'(id(), [strict], New),
-                   optic:'%extend'(id(), #{strict=>true}, New)),
-     ?_assertEqual(optic:'%extend'(id(), [create], New),
-                   optic:'%extend'(id(), #{create=>true}, New))].
+    True = fun true/1,
+    [?_assert(optic:is_optic(
+                optic:variations(id(), #{}, New))),
+     ?_assert(optic:is_optic(
+                optic:variations(id(), #{strict=>false}, New))),
+     ?_assert(optic:is_optic(
+                optic:variations(id(), #{strict=>true}, New))),
+     ?_assert(optic:is_optic(
+                optic:variations(id(), #{create=>undefined}, New))),
+     ?_assert(optic:is_optic(
+                optic:variations(id(), #{filter=>fun true/1}, New))),
+     ?_assert(optic:is_optic(
+                optic:variations(id(), #{require=>fun true/1}, New))),
+     ?_assertEqual(optic:variations(id(), #{}, New),
+                   optic:variations(id(), #{strict=>false}, New)),
+     ?_assertEqual(optic:variations(id(), [], New),
+                   optic:variations(id(), #{strict=>false}, New)),
+     ?_assertEqual(optic:variations(id(), [strict], New),
+                   optic:variations(id(), #{strict=>true}, New)),
+     ?_assertEqual(optic:variations(id(), [create], New),
+                   optic:variations(id(), #{create=>true}, New)),
+     ?_assertEqual(optic:variations(id(), [{filter, True}], New),
+                   optic:variations(id(), #{filter=>True}, New)),
+     ?_assertEqual(optic:variations(id(), [{require, True}], New),
+                   optic:variations(id(), #{require=>True}, New))].
+
+create_test_() ->
+    Create = optic:create(
+               optic:require(fun erlang:is_list/1),
+               fun (_Data, _Template) -> [] end,
+               template),
+    [?_assertEqual({ok, [[]]},
+                   optic:get(Create, [])),
+     ?_assertEqual({error, required},
+                   optic:get(Create, atom)),
+     ?_assertEqual({ok, modified},
+                   optic:put(Create, [], modified)),
+     ?_assertEqual({ok, modified},
+                   optic:put(Create, atom, modified))].
+
+lax_test_() ->
+    Lax = optic:lax(optic:require(fun erlang:is_list/1)),
+    [?_assertEqual({ok, [[]]},
+                   optic:get(Lax, [])),
+     ?_assertEqual({ok, []},
+                   optic:get(Lax, atom)),
+     ?_assertEqual({ok, modified},
+                   optic:put(Lax, [], modified)),
+     ?_assertEqual({ok, atom},
+                   optic:put(Lax, atom, modified))].
 
 fold_test() ->
     ?assertEqual({ok, 2},
@@ -96,7 +163,9 @@ mapfold_test() ->
     ?assertEqual({ok, {modified, 2}},
                  optic:mapfold([id()],
                                atom,
-                               fun (atom, Acc) -> {modified, Acc + 1} end,
+                               fun (atom, Acc) ->
+                                       {modified, Acc + 1}
+                               end,
                                1)).
 
 map_test() ->
@@ -109,12 +178,58 @@ put_test() ->
     ?assertEqual({ok, modified},
                  optic:put([id()], atom, modified)).
 
+id_get_test() ->
+    ?assertEqual({ok, [atom]},
+                 optic:get(optic:id(), atom)).
+
+id_put_test() ->
+    ?assertEqual({ok, new},
+                 optic:put(optic:id(), atom, new)).
+
+error_get_test() ->
+    ?assertEqual({error, reason},
+                 optic:get(optic:error(reason), atom)).
+
+error_put_test() ->
+    ?assertEqual({error, reason},
+                 optic:put(optic:error(reason), atom, new)).
+
+filter_get_test_() ->
+    [?_assertEqual({ok, [atom]},
+                   optic:get(optic:filter(fun true/1), atom)),
+     ?_assertEqual({ok, []},
+                   optic:get(optic:filter(fun false/1), atom))].
+
+filter_put_test_() ->
+    [?_assertEqual({ok, modified},
+                   optic:put(optic:filter(fun true/1), atom, modified)),
+     ?_assertEqual({ok, atom},
+                   optic:put(optic:filter(fun false/1), atom, modified))].
+
+require_get_test_() ->
+    [?_assertEqual({ok, [atom]},
+                   optic:get(optic:require(fun true/1), atom)),
+     ?_assertEqual({error, required},
+                   optic:get(optic:require(fun false/1), atom))].
+
+require_put_test_() ->
+    [?_assertEqual({ok, modified},
+                   optic:put(optic:require(fun true/1), atom, modified)),
+     ?_assertEqual({error, required},
+                   optic:put(optic:require(fun false/1), atom, modified))].
+
 %%%===================================================================
 %%% Internal Functions
 %%%===================================================================
 
 id() ->
     MapFold = fun (Fun, Acc, Data) ->
-        {ok, Fun(Data, Acc)}
-    end,
+                      {ok, Fun(Data, Acc)}
+              end,
     optic:new(MapFold).
+
+true(_) ->
+    true.
+
+false(_) ->
+    false.

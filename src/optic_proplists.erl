@@ -29,7 +29,7 @@ all() ->
     values(#{}).
 
 %% @see values/1
--spec all(optic:extend_options()) -> optic:optic().
+-spec all(optic:variations()) -> optic:optic().
 all(Options) ->
     values(Options).
 
@@ -51,33 +51,38 @@ keys() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec keys(optic:extend_options()) -> optic:optic().
+-spec keys(optic:variations()) -> optic:optic().
 keys(Options) ->
-    Fold = fun (Fun, Acc, List) when is_list(List) ->
-        {ok, lists:foldl(fun ({Key, _Value}, InnerAcc) ->
-                             Fun(Key, InnerAcc)
-                         end,
-                         Acc,
-                         proplists:unfold(List))};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {ok, lists:foldl(
+                   fun ({Key, _Value}, InnerAcc) ->
+                           Fun(Key, InnerAcc)
+                   end,
+                   Acc,
+                   proplists:unfold(List))};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, List) when is_list(List) ->
-        {NewList, NewAcc} = lists:foldl(fun ({Key, Value}, {InnerList, InnerAcc}) ->
-                                           {NewKey, NewAcc} = Fun(Key, InnerAcc),
-                                           {[{NewKey, Value} | InnerList], NewAcc}
-                                       end,
-                                       {[], Acc},
-                                       proplists:unfold(List)),
-        {ok, {lists:reverse(NewList), NewAcc}};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {NewList, NewAcc} = lists:foldl(
+                                  fun ({Key, Value}, {InnerList, InnerAcc}) ->
+                                          {NewKey, NewAcc} = Fun(Key, InnerAcc),
+                                          {[{NewKey, Value} | InnerList], NewAcc}
+                                  end,
+                                  {[], Acc},
+                                  proplists:unfold(List)),
+            {ok, {lists:reverse(NewList), NewAcc}};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        []
+    New =
+    fun (_Data, _Template) ->
+            []
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see values/1
 -spec values() -> optic:optic().
@@ -96,33 +101,38 @@ values() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec values(optic:extend_options()) -> optic:optic().
+-spec values(optic:variations()) -> optic:optic().
 values(Options) ->
-    Fold = fun (Fun, Acc, List) when is_list(List) ->
-        {ok, lists:foldl(fun ({_Key, Value}, InnerAcc) ->
-                             Fun(Value, InnerAcc)
-                         end,
-                         Acc,
-                         proplists:unfold(List))};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {ok, lists:foldl(
+                   fun ({_Key, Value}, InnerAcc) ->
+                           Fun(Value, InnerAcc)
+                   end,
+                   Acc,
+                   proplists:unfold(List))};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, List) when is_list(List) ->
-        {NewList, NewAcc} = lists:foldl(fun ({Key, Value}, {InnerList, InnerAcc}) ->
-                                            {NewValue, NewAcc} = Fun(Value, InnerAcc),
-                                            {[{Key, NewValue} | InnerList], NewAcc}
-                                        end,
-                                        {[], Acc},
-                                        proplists:unfold(List)),
-        {ok, {lists:reverse(NewList), NewAcc}};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {NewList, NewAcc} = lists:foldl(
+                                  fun ({Key, Value}, {InnerList, InnerAcc}) ->
+                                          {NewValue, NewAcc} = Fun(Value, InnerAcc),
+                                          {[{Key, NewValue} | InnerList], NewAcc}
+                                  end,
+                                  {[], Acc},
+                                  proplists:unfold(List)),
+            {ok, {lists:reverse(NewList), NewAcc}};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        []
+    New =
+    fun (_Data, _Template) ->
+            []
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see properties/1
 -spec properties() -> optic:optic().
@@ -143,29 +153,33 @@ properties() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec properties(optic:extend_options()) -> optic:optic().
+-spec properties(optic:variations()) -> optic:optic().
 properties(Options) ->
-    Fold = fun (Fun, Acc, List) when is_list(List) ->
-        {ok, lists:foldl(Fun, Acc, proplists:unfold(List))};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {ok, lists:foldl(Fun, Acc, proplists:unfold(List))};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, List) when is_list(List) ->
-        {NewList, NewAcc} = lists:foldl(fun (Tuple, {InnerList, InnerAcc}) ->
-                                            {NewTuple, NewAcc} = Fun(Tuple, InnerAcc),
-                                            {[NewTuple | InnerList], NewAcc}
-                                        end,
-                                        {[], Acc},
-                                        proplists:unfold(List)),
-        {ok, {lists:reverse(NewList), NewAcc}};
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            {NewList, NewAcc} = lists:foldl(
+                                  fun (Tuple, {InnerList, InnerAcc}) ->
+                                          {NewTuple, NewAcc} = Fun(Tuple, InnerAcc),
+                                          {[NewTuple | InnerList], NewAcc}
+                                  end,
+                                  {[], Acc},
+                                  proplists:unfold(List)),
+            {ok, {lists:reverse(NewList), NewAcc}};
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (_Data, _Template) ->
-        []
+    New =
+    fun (_Data, _Template) ->
+            []
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see key/2
 -spec key(term()) -> optic:optic().
@@ -187,50 +201,55 @@ key(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec key(term(), optic:extend_options()) -> optic:optic().
+-spec key(term(), optic:variations()) -> optic:optic().
 key(Key, Options) ->
-    Fold = fun (Fun, Acc, List) when is_list(List) ->
-        case proplists:get_all_values(Key, List) of
-            [] ->
-                {error, undefined};
-            Values ->
-                {ok, lists:foldl(fun (Value, InnerAcc) ->
-                                     Fun(Value, InnerAcc)
-                                 end,
-                                 Acc,
-                                 Values)}
-        end;
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            case proplists:get_all_values(Key, List) of
+                [] ->
+                    {error, undefined};
+                Values ->
+                    {ok, lists:foldl(
+                           fun (Value, InnerAcc) ->
+                                   Fun(Value, InnerAcc)
+                           end,
+                           Acc,
+                           Values)}
+            end;
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, List) when is_list(List) ->
-        case proplists:get_all_values(Key, List) of
-            [] ->
-                {error, undefined};
-            _ ->
-                {ok, lists:mapfoldl(fun (Elem, InnerAcc) ->
-                                        case proplists:is_defined(Key, [Elem]) of
-                                            true ->
-                                                Value = proplists:get_value(Key, [Elem]),
-                                                {NewValue, NewAcc} = Fun(Value, InnerAcc),
-                                                {{Key, NewValue}, NewAcc};
-                                            false ->
-                                                {Elem, InnerAcc}
-                                        end
-                                    end,
-                                    Acc,
-                                    List)}
-        end;
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            case proplists:get_all_values(Key, List) of
+                [] ->
+                    {error, undefined};
+                _ ->
+                    {ok, lists:mapfoldl(
+                           fun (Elem, InnerAcc) ->
+                                   case proplists:is_defined(Key, [Elem]) of
+                                       true ->
+                                           Value = proplists:get_value(Key, [Elem]),
+                                           {NewValue, NewAcc} = Fun(Value, InnerAcc),
+                                           {{Key, NewValue}, NewAcc};
+                                       false ->
+                                           {Elem, InnerAcc}
+                                   end
+                           end,
+                           Acc,
+                           List)}
+            end;
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (List, Template) when is_list(List) ->
-        [{Key, Template} | List];
-    (_Data, Template) ->
-        [{Key, Template}]
+    New =
+    fun (List, Template) when is_list(List) ->
+            [{Key, Template} | List];
+        (_Data, Template) ->
+            [{Key, Template}]
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
 
 %% @see property/2
 -spec property(term()) -> optic:optic().
@@ -253,47 +272,52 @@ property(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec property(term(), optic:extend_options()) -> optic:optic().
+-spec property(term(), optic:variations()) -> optic:optic().
 property(Key, Options) ->
-    Fold = fun (Fun, Acc, List) when is_list(List) ->
-        case proplists:get_all_values(Key, List) of
-            [] ->
-                {error, undefined};
-            Values ->
-                {ok, lists:foldl(fun (Value, InnerAcc) ->
-                                    Fun({Key, Value}, InnerAcc)
-                                 end,
-                                 Acc,
-                                 Values)}
-        end;
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    Fold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            case proplists:get_all_values(Key, List) of
+                [] ->
+                    {error, undefined};
+                Values ->
+                    {ok, lists:foldl(
+                           fun (Value, InnerAcc) ->
+                                   Fun({Key, Value}, InnerAcc)
+                           end,
+                           Acc,
+                           Values)}
+            end;
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    MapFold = fun (Fun, Acc, List) when is_list(List) ->
-        case proplists:get_all_values(Key, List) of
-            [] ->
-                {error, undefined};
-            _ ->
-                {ok, lists:mapfoldl(fun (Elem, InnerAcc) ->
-                                        case proplists:is_defined(Key, [Elem]) of
-                                            true ->
-                                                Value = proplists:get_value(Key, [Elem]),
-                                                {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, InnerAcc),
-                                                {{NewKey, NewValue}, NewAcc};
-                                            false ->
-                                                {Elem, InnerAcc}
-                                        end
-                                    end,
-                                    Acc,
-                                    List)}
-        end;
-    (_Fun, _Acc, _Data) ->
-        {error, undefined}
+    MapFold =
+    fun (Fun, Acc, List) when is_list(List) ->
+            case proplists:get_all_values(Key, List) of
+                [] ->
+                    {error, undefined};
+                _ ->
+                    {ok, lists:mapfoldl(
+                           fun (Elem, InnerAcc) ->
+                                   case proplists:is_defined(Key, [Elem]) of
+                                       true ->
+                                           Value = proplists:get_value(Key, [Elem]),
+                                           {{NewKey, NewValue}, NewAcc} = Fun({Key, Value}, InnerAcc),
+                                           {{NewKey, NewValue}, NewAcc};
+                                       false ->
+                                           {Elem, InnerAcc}
+                                   end
+                           end,
+                           Acc,
+                           List)}
+            end;
+        (_Fun, _Acc, _Data) ->
+            {error, undefined}
     end,
-    New = fun (List, Template) when is_list(List) ->
-        [{Key, Template} | List];
-    (_Data, Template) ->
-        [{Key, Template}]
+    New =
+    fun (List, Template) when is_list(List) ->
+            [{Key, Template} | List];
+        (_Data, Template) ->
+            [{Key, Template}]
     end,
     Optic = optic:new(MapFold, Fold),
-    optic:'%extend'(Optic, Options, New).
+    optic:variations(Optic, Options, New).
