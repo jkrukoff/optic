@@ -587,9 +587,10 @@ part of the focus.
 Example:
 
 ```
-> IsOdd = fun (Elem) -> Elem % 2 == 1 end,
-> optic:get([optic:require(IsOdd)], [1,2,3]).
-{error, required}`''
+  > IsOdd = fun (Elem) -> Elem % 2 == 1 end,
+  > optic:get([optic:require(IsOdd)], [1,2,3]).
+  {error, required}
+```
 
 <a name="wrap-2"></a>
 
