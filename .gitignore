@@ -22,6 +22,10 @@ config/test.config
 # Optional python dependencies.
 .virtualenv
 
+# Optional node.js dependencies.
+node_modules/
+package-lock.json
+
 # Vim files.
 *.swo
 *.swp
