@@ -43,7 +43,8 @@
 %% @end
 %% @param Paths A list of path components to convert.
 %% @returns A list of opaque optic records.
--spec new(Paths :: paths()) -> optic:optics().
+-spec new(Paths) -> optic:optics() when
+      Paths :: paths().
 new([]) ->
     [];
 new([Path | Paths]) when is_list(Path); is_binary(Path) ->

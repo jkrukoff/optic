@@ -34,7 +34,8 @@ all() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec all(optic:variations()) -> optic:optic().
+-spec all(Options) -> optic:optic() when
+      Options :: optic:variations().
 all(Options) ->
     Fold =
     fun (Fun, Acc, Tuple) when is_tuple(Tuple) ->
@@ -57,7 +58,8 @@ all(Options) ->
     optic:variations(Optic, Options, New).
 
 %% @see element/2
--spec element(pos_integer()) -> optic:optic().
+-spec element(N) -> optic:optic() when
+      N :: pos_integer().
 element(N) ->
     optic_tuples:element(N, #{}).
 
@@ -75,7 +77,9 @@ element(N) ->
 %% @param N The index of the tuple element to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec element(pos_integer(), optic:variations()) -> optic:optic().
+-spec element(N, Options) -> optic:optic() when
+      N :: pos_integer(),
+      Options :: optic:variations().
 element(N, Options) ->
     Fold =
     fun (Fun, Acc, Tuple) when N =< tuple_size(Tuple) ->
@@ -103,7 +107,10 @@ element(N, Options) ->
     optic:variations(Optic, Options, New).
 
 %% @see field/4
--spec field(atom(), pos_integer(), pos_integer()) -> optic:optic().
+-spec field(Tag, Size, N) -> optic:optic() when
+      Tag :: atom(),
+      Size :: pos_integer(),
+      N :: pos_integer().
 field(Tag, Size, N) ->
     field(Tag, Size, N, #{}).
 
@@ -132,7 +139,11 @@ field(Tag, Size, N) ->
 %% @param N The index of the field in the record tuple.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec field(atom(), pos_integer(), pos_integer(), optic:variations()) -> optic:optic().
+-spec field(Tag, Size, N, Options) -> optic:optic() when
+      Tag :: atom(),
+      Size :: pos_integer(),
+      N :: pos_integer(),
+      Options :: optic:variations().
 field(Tag, Size, N, Options) ->
     Fold =
     fun (Fun, Acc, Tuple) when erlang:element(1, Tuple) == Tag,

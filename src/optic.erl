@@ -123,7 +123,8 @@
 %% @end
 %% @returns An opaque optic record.
 %% @see new/2
--spec new(MapFold :: optic_mapfold()) -> optic().
+-spec new(MapFold) -> optic() when
+      MapFold :: optic_mapfold().
 new(MapFold) ->
     Fold =
     fun (Fun, Acc, Data) ->
@@ -184,7 +185,9 @@ new(MapFold) ->
 %% ok or error tagged tuple.
 %% @end
 %% @returns An opaque optic record.
--spec new(MapFold :: optic_mapfold(), Fold :: optic_fold()) -> optic().
+-spec new(MapFold, Fold) -> optic() when
+      MapFold :: optic_mapfold(),
+      Fold :: optic_fold().
 new(MapFold, Fold) ->
     #optic{fold=Fold, mapfold=MapFold}.
 
@@ -196,8 +199,9 @@ new(MapFold, Fold) ->
 %% @end
 %% @returns An opaque optic record.
 %% @see wrap/3
--spec wrap(Optic :: optic(),
-           WrapMapFold :: optic_wrap_mapfold()) -> optic().
+-spec wrap(Optic, WrapMapFold) -> optic() when
+      Optic :: optic(),
+      WrapMapFold :: optic_wrap_mapfold().
 wrap(#optic{} = Optic, WrapMapFold) ->
     WrapFold =
     fun (Fold) ->
@@ -237,9 +241,10 @@ wrap(#optic{} = Optic, WrapMapFold) ->
 %% A mapping function to apply to the optic's fold function.
 %% @end
 %% @returns An opaque optic record.
--spec wrap(Optic :: optic(),
-           WrapMapFold :: optic_wrap_mapfold(),
-           WrapFold :: optic_wrap_fold()) -> optic().
+-spec wrap(Optic, WrapMapFold, WrapFold) -> optic() when
+      Optic :: optic(),
+      WrapMapFold :: optic_wrap_mapfold(),
+      WrapFold :: optic_wrap_fold().
 wrap(#optic{fold=Fold, mapfold=MapFold}, WrapMapFold, WrapFold) ->
     NewMapFold = WrapMapFold(MapFold),
     NewFold = WrapFold(Fold),
@@ -255,7 +260,8 @@ wrap(#optic{fold=Fold, mapfold=MapFold}, WrapMapFold, WrapFold) ->
 %% @end
 %% @param Optics The list of optics to compose.
 %% @returns An opaque optic record.
--spec chain(Optics :: optics()) -> optic().
+-spec chain(Optics) -> optic() when
+      Optics :: optics().
 chain(#optic{} = Optic) ->
     Optic;
 chain([]) ->
@@ -272,7 +278,8 @@ chain([Head | Tail]) ->
 %% @end
 %% @param Optics The list of optics to compose.
 %% @returns An opaque optic record.
--spec merge(Optics :: optics()) -> optic().
+-spec merge(Optics) -> optic() when
+      Optics :: optics().
 merge(#optic{} = Optic) ->
     Optic;
 merge([]) ->
@@ -285,7 +292,8 @@ merge([Head | Tail]) ->
 %% @end
 %% @param Candidate The term to test.
 %% @returns A boolean flag.
--spec is_optic(Candidate :: term()) -> boolean().
+-spec is_optic(Candidate) -> boolean() when
+      Candidate :: term().
 is_optic(#optic{}) ->
     true;
 is_optic(_) ->
@@ -320,7 +328,10 @@ is_optic(_) ->
 %% @see filter/1
 %% @see lax/1
 %% @see require/1
--spec variations(Optic :: optic(), Options :: variations(), New :: callback_new()) -> optic().
+-spec variations(Optic, Options, New) -> optic() when
+      Optic :: optic(),
+      Options :: variations(),
+      New :: callback_new().
 variations(#optic{} = Optic, Options, New) when is_list(Options) ->
     % Normalize proplist option form to map form.
     Strict = proplists:get_bool(strict, Options),
@@ -393,7 +404,10 @@ variations(#optic{} = Optic, #{} = Options, New) ->
 %% The template value to be given to the callback function.
 %% @end
 %% @returns An opaque optic record.
--spec create(Optic :: optic(), New :: callback_new(), Template :: term()) -> optic().
+-spec create(Optic, New, Template) -> optic() when
+      Optic :: optic(),
+      New :: callback_new(),
+      Template :: term().
 create(Optic, New, Template) ->
     WrapFold = fun (Fold) -> Fold end,
     WrapMapFold =
@@ -417,7 +431,8 @@ create(Optic, New, Template) ->
 %% @end
 %% @param Optic The existing optic to wrap.
 %% @returns An opaque optic record.
--spec lax(optic()) -> optic().
+-spec lax(Optic) -> optic() when
+      Optic :: optic().
 lax(Optic) ->
     WrapFold =
     fun (Fold) ->
@@ -465,10 +480,12 @@ lax(Optic) ->
 %% On success, returns a tuple of ok and the final accumulator value.
 %% On failure, returns an error tuple.
 %% @end
--spec fold(Optics :: optics(),
-           Data :: term(),
-           Fold :: callback_fold(),
-           Acc :: term()) -> option(NewAcc :: term()).
+-spec fold(Optics, Data, Fold, Acc) -> option(NewAcc) when
+      Optics :: optics(),
+      Data :: term(),
+      Fold :: callback_fold(),
+      Acc :: term(),
+      NewAcc :: term().
 fold(Optics, Data, Fold, Acc) ->
     #optic{fold=OpticFold} = optic:chain(Optics),
     OpticFold(Fold, Acc, Data).
@@ -480,8 +497,10 @@ fold(Optics, Data, Fold, Acc) ->
 %% @param Optics A list of optics to apply. Leftmost is applied first.
 %% @param Data The container to apply the optics to.
 %% @returns A list of the focused values.
--spec get(Optics :: optics(),
-          Data :: term()) -> option(Values :: [term()]).
+-spec get(Optics, Data) -> option(Values) when
+      Optics :: optics(),
+      Data :: term(),
+      Values :: [term()].
 get(Optics, Data) ->
     case fold(Optics,
               Data,
@@ -510,10 +529,13 @@ get(Optics, Data) ->
 %% container and the final accumulator value. On failure, returns an
 %% error tuple.
 %% @end
--spec mapfold(Optics :: optics(),
-              Data :: term(),
-              MapFold :: callback_mapfold(),
-              Acc :: term()) -> option({NewData :: term(), NewAcc :: term()}).
+-spec mapfold(Optics, Data, MapFold, Acc) -> option({NewData, NewAcc}) when
+      Optics :: optics(),
+      Data :: term(),
+      MapFold :: callback_mapfold(),
+      Acc :: term(),
+      NewData :: term(),
+      NewAcc :: term().
 mapfold(Optics, Data, MapFold, Acc) ->
     #optic{mapfold=OpticMapFold} = optic:chain(Optics),
     OpticMapFold(MapFold, Acc, Data).
@@ -532,9 +554,11 @@ mapfold(Optics, Data, MapFold, Acc) ->
 %% On success, returns a tuple of ok and the modified container.
 %% On failure, returns an error tuple.
 %% @end
--spec map(Optics :: optics(),
-          Data :: term(),
-          Map :: callback_map()) -> option(NewData :: term()).
+-spec map(Optics, Data, Map) -> option(NewData) when
+      Optics :: optics(),
+      Data :: term(),
+      Map :: callback_map(),
+      NewData :: term().
 map(Optics, Data, Map) ->
     case mapfold(Optics,
                  Data,
@@ -556,9 +580,11 @@ map(Optics, Data, Map) ->
 %% On success, returns a tuple of ok and the modified container.
 %% On failure, returns an error tuple.
 %% @end
--spec put(Optics :: optics(),
-          Data :: term(),
-          Value :: term()) -> option(NewData :: term()).
+-spec put(Optics, Data, Value) -> option(NewData) when
+      Optics :: optics(),
+      Data :: term(),
+      Value :: term(),
+      NewData :: term().
 put(Optics, Data, Value) ->
     map(Optics, Data, fun (_) -> Value end).
 
@@ -600,7 +626,8 @@ id() ->
 %% @end
 %% @param Reason The error description to return.
 %% @returns An opaque optic record.
--spec error(Reason :: term()) -> optic:optic().
+-spec error(Reason) -> optic:optic() when
+      Reason :: term().
 error(Reason) ->
     Fold =
     fun (_Fun, _Acc, _Data) ->
@@ -629,7 +656,8 @@ error(Reason) ->
 %% true or false.
 %% @end
 %% @returns An opaque optic record.
--spec filter(callback_filter()) -> optic:optic().
+-spec filter(Filter) -> optic:optic() when
+      Filter :: callback_filter().
 filter(Filter) ->
     Fold =
     fun (Fun, Acc, Data) ->
@@ -672,7 +700,8 @@ filter(Filter) ->
 %% true or false.
 %% @end
 %% @returns An opaque optic record.
--spec require(callback_filter()) -> optic:optic().
+-spec require(Filter) -> optic:optic() when
+      Filter :: callback_filter().
 require(Filter) ->
     Fold =
     fun (Fun, Acc, Data) ->

@@ -35,7 +35,8 @@
 %% @end
 %% @param Key The key to focus on.
 %% @returns An opaque optic record.
--spec key(term()) -> optic:optic().
+-spec key(Key) -> optic:optic() when
+      Key :: term().
 key(Key) ->
     Fold =
     fun (Fun, Acc, Map) when is_map(Map) ->
@@ -140,7 +141,8 @@ key(Key) ->
 %% @end
 %% @param Index The one based index of the element to focus on.
 %% @returns An opaque optic record.
--spec index(non_neg_integer()) -> optic:optic().
+-spec index(Index) -> optic:optic() when
+      Index :: non_neg_integer().
 index(Index) ->
     Fold =
     fun (Fun, Acc, List) when Index =< length(List) ->

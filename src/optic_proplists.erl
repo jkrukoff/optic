@@ -29,7 +29,8 @@ all() ->
     values(#{}).
 
 %% @see values/1
--spec all(optic:variations()) -> optic:optic().
+-spec all(Options) -> optic:optic() when
+      Options :: optic:variations().
 all(Options) ->
     values(Options).
 
@@ -51,7 +52,8 @@ keys() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec keys(optic:variations()) -> optic:optic().
+-spec keys(Options) -> optic:optic() when
+      Options :: optic:variations().
 keys(Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->
@@ -101,7 +103,8 @@ values() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec values(optic:variations()) -> optic:optic().
+-spec values(Options) -> optic:optic() when
+    Options :: optic:variations().
 values(Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->
@@ -153,7 +156,8 @@ properties() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec properties(optic:variations()) -> optic:optic().
+-spec properties(Options) -> optic:optic() when
+      Options :: optic:variations().
 properties(Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->
@@ -182,7 +186,8 @@ properties(Options) ->
     optic:variations(Optic, Options, New).
 
 %% @see key/2
--spec key(term()) -> optic:optic().
+-spec key(Key) -> optic:optic() when
+      Key :: term().
 key(Key) ->
     key(Key, #{}).
 
@@ -201,7 +206,9 @@ key(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec key(term(), optic:variations()) -> optic:optic().
+-spec key(Key, Options) -> optic:optic() when
+      Key :: term(),
+      Options :: optic:variations().
 key(Key, Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->
@@ -252,7 +259,8 @@ key(Key, Options) ->
     optic:variations(Optic, Options, New).
 
 %% @see property/2
--spec property(term()) -> optic:optic().
+-spec property(Key) -> optic:optic() when
+      Key :: term().
 property(Key) ->
     property(Key, #{}).
 
@@ -272,7 +280,9 @@ property(Key) ->
 %% @param Key The key to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec property(term(), optic:variations()) -> optic:optic().
+-spec property(Key, Options) -> optic:optic() when
+      Key :: term(),
+      Options :: optic:variations().
 property(Key, Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->

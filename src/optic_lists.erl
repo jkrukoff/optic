@@ -36,7 +36,8 @@ all() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec all(optic:variations()) -> optic:optic().
+-spec all(Options) -> optic:optic() when
+      Options :: optic:variations().
 all(Options) ->
     Fold =
     fun (Fun, Acc, List) when is_list(List) ->
@@ -75,7 +76,8 @@ head() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec head(optic:variations()) -> optic:optic().
+-spec head(Options) -> optic:optic() when
+      Options :: optic:variations().
 head(Options) ->
     Fold =
     fun (Fun, Acc, [Head | _]) ->
@@ -115,7 +117,8 @@ tail() ->
 %% @end
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec tail(optic:variations()) -> optic:optic().
+-spec tail(Options) -> optic:optic() when
+      Options :: optic:variations().
 tail(Options) ->
     Fold =
     fun (Fun, Acc, [_ | Tail]) ->
@@ -138,7 +141,8 @@ tail(Options) ->
     optic:variations(Optic, Options, New).
 
 %% @see nth/2
--spec nth(pos_integer()) -> optic:optic().
+-spec nth(N) -> optic:optic() when
+      N :: pos_integer().
 nth(N) ->
     nth(N, #{}).
 
@@ -156,7 +160,9 @@ nth(N) ->
 %% @param N The index of the list element to focus on.
 %% @param Options Common optic options.
 %% @returns An opaque optic record.
--spec nth(pos_integer(), optic:variations()) -> optic:optic().
+-spec nth(N, Options) -> optic:optic() when
+      N :: pos_integer(),
+      Options :: optic:variations().
 nth(N, Options) ->
     Fold =
     fun (Fun, Acc, List) when N =< length(List) ->
