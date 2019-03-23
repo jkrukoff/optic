@@ -45,13 +45,13 @@ We could then update all pets to a new status by:
 ## Modules ##
 
 <table width="100%" border="0" summary="list of modules">
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic.md" class="module">optic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_path.md" class="module">optic_path</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
-<tr><td><a href="http://github.com/jkrukoff/optic/blob/composition-experiment/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_path.md" class="module">optic_path</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
 
 
 ### Getting Started ###
