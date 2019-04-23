@@ -45,7 +45,7 @@ keys() ->
 %% Example:
 %%
 %% ```
-%% > optic:get([optic_maps:keys()], #{first => 1, second => 2).
+%% > optic:get([optic_maps:keys()], #{first => 1, second => 2}).
 %% {ok,[first,second]}
 %% '''
 %% @end
@@ -93,7 +93,7 @@ values() ->
 %% Example:
 %%
 %% ```
-%% > optic:get([optic_maps:values()], #{first => 1, second => 2).
+%% > optic:get([optic_maps:values()], #{first => 1, second => 2}).
 %% {ok,[1,2]}
 %% '''
 %% @end
@@ -142,7 +142,7 @@ associations() ->
 %% Example:
 %%
 %% ```
-%% > optic:get([optic_maps:associations()], #{first => 1, second => 2).
+%% > optic:get([optic_maps:associations()], #{first => 1, second => 2}).
 %% {ok,[{first,1},{second,2}]}
 %% '''
 %% @end
@@ -191,7 +191,7 @@ key(Key) ->
 %% Example:
 %%
 %% ```
-%% > optic:get([optic_maps:key(first)], #{first => 1, second => 2).
+%% > optic:get([optic_maps:key(first)], #{first => 1, second => 2}).
 %% {ok,[1]}
 %% '''
 %% @end
@@ -238,7 +238,7 @@ association(Key) ->
 %% Example:
 %%
 %% ```
-%% > optic:get([optic_maps:association(first)], #{first => 1, second => 2).
+%% > optic:get([optic_maps:association(first)], #{first => 1, second => 2}).
 %% {ok,[{first,1}]}
 %% '''
 %% @end
