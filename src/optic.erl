@@ -66,7 +66,7 @@
 -type variations() :: #{create=>term(),
                         strict=>boolean(),
                         filter=>callback_filter(),
-                        require=>callback_filter()} | [proplists:property()].
+                        require=>callback_filter()} | proplists:proplist().
 %% Shared options to control optic construction.
 
 -opaque optic() :: #optic{}.
@@ -470,23 +470,23 @@ lax(Optic) ->
 %% determined by the optics used.
 %% @end
 %% @param Optics A list of optics to apply. Leftmost is applied first.
-%% @param Data The container to apply the optics to.
 %% @param Fold
 %% The callback function to invoke on the focused elements and
 %% accumulator. Expected to return the modified accumulator.
 %% @end
 %% @param Acc The initial accumulator value.
+%% @param Data The container to apply the optics to.
 %% @returns
 %% On success, returns a tuple of ok and the final accumulator value.
 %% On failure, returns an error tuple.
 %% @end
--spec fold(Optics, Data, Fold, Acc) -> option(NewAcc) when
+-spec fold(Optics, Fold, Acc, Data) -> option(NewAcc) when
       Optics :: optics(),
-      Data :: term(),
       Fold :: callback_fold(),
       Acc :: term(),
+      Data :: term(),
       NewAcc :: term().
-fold(Optics, Data, Fold, Acc) ->
+fold(Optics, Fold, Acc, Data) ->
     #optic{fold=OpticFold} = optic:chain(Optics),
     OpticFold(Fold, Acc, Data).
 
@@ -503,9 +503,9 @@ fold(Optics, Data, Fold, Acc) ->
       Values :: [term()].
 get(Optics, Data) ->
     case fold(Optics,
-              Data,
               fun (Elem, Acc) -> [Elem | Acc] end,
-              []) of
+              [],
+              Data) of
         {ok, Acc} ->
             {ok, lists:reverse(Acc)};
         {error, _} = Error ->
@@ -529,14 +529,14 @@ get(Optics, Data) ->
 %% container and the final accumulator value. On failure, returns an
 %% error tuple.
 %% @end
--spec mapfold(Optics, Data, MapFold, Acc) -> option({NewData, NewAcc}) when
+-spec mapfold(Optics, MapFold, Acc, Data) -> option({NewData, NewAcc}) when
       Optics :: optics(),
-      Data :: term(),
       MapFold :: callback_mapfold(),
       Acc :: term(),
+      Data :: term(),
       NewData :: term(),
       NewAcc :: term().
-mapfold(Optics, Data, MapFold, Acc) ->
+mapfold(Optics, MapFold, Acc, Data) ->
     #optic{mapfold=OpticMapFold} = optic:chain(Optics),
     OpticMapFold(MapFold, Acc, Data).
 
@@ -554,16 +554,16 @@ mapfold(Optics, Data, MapFold, Acc) ->
 %% On success, returns a tuple of ok and the modified container.
 %% On failure, returns an error tuple.
 %% @end
--spec map(Optics, Data, Map) -> option(NewData) when
+-spec map(Optics, Map, Data) -> option(NewData) when
       Optics :: optics(),
-      Data :: term(),
       Map :: callback_map(),
+      Data :: term(),
       NewData :: term().
-map(Optics, Data, Map) ->
+map(Optics, Map, Data) ->
     case mapfold(Optics,
-                 Data,
                  fun (Elem, undefined) -> {Map(Elem), undefined} end,
-                 undefined) of
+                 undefined,
+                 Data) of
         {ok, {Updated, undefined}} ->
             {ok, Updated};
         {error, _} = Error ->
@@ -580,13 +580,13 @@ map(Optics, Data, Map) ->
 %% On success, returns a tuple of ok and the modified container.
 %% On failure, returns an error tuple.
 %% @end
--spec put(Optics, Data, Value) -> option(NewData) when
+-spec put(Optics, Value, Data) -> option(NewData) when
       Optics :: optics(),
-      Data :: term(),
       Value :: term(),
+      Data :: term(),
       NewData :: term().
-put(Optics, Data, Value) ->
-    map(Optics, Data, fun (_) -> Value end).
+put(Optics, Value, Data) ->
+    map(Optics, fun (_) -> Value end, Data).
 
 %%%===================================================================
 %%% API - Optics

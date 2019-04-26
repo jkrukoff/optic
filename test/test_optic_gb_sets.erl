@@ -23,23 +23,23 @@ all_map_test() ->
     ?assertEqual({ok, [2, 4, 6]},
                  sort_put(
                    optic:map([optic_gb_sets:all([strict])],
-                             gb_sets:from_list([1, 2, 3]),
-                             fun (Elem) -> Elem * 2 end))).
+                             fun (Elem) -> Elem * 2 end,
+                             gb_sets:from_list([1, 2, 3])))).
 
 all_put_test_() ->
     [?_assertEqual({ok, [4]},
                    sort_put(
                      optic:put([optic_gb_sets:all([strict])],
-                               gb_sets:from_list([1, 2, 3]),
-                               4))),
+                               4,
+                               gb_sets:from_list([1, 2, 3])))),
      ?_assertEqual({error, undefined},
-                   optic:put([optic_gb_sets:all([strict])], atom, 4))].
+                   optic:put([optic_gb_sets:all([strict])], 4, atom))].
 
 all_create_test() ->
     ?assertEqual({ok, gb_sets:new()},
                  optic:put([optic_gb_sets:all([strict, create])],
-                           atom,
-                           4)).
+                           4,
+                           atom)).
 
 %%%===================================================================
 %%% Internal Functions

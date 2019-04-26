@@ -1,6 +1,6 @@
 @author John Krukoff <github@cultist.org>
 @copyright 2019 John Krukoff
-@version 2.1.0
+@version 3.0.0
 @title optic
 @doc <h3>Overview</h3>
 
@@ -31,8 +31,8 @@ We could then update all pets to a new status by:
 
 ```
 > optic:put([optic_lists:all(), optic_maps:key(<<"status">>)],
-            Pets,
-            <<"sold">>).
+            <<"sold">>,
+            Pets).
 
 {ok,[#{
   <<"id">> => 628178654,
@@ -175,13 +175,13 @@ Let's explore the variations in the context of modifying a container:
 > Data = [#{name => first},#{id => second},#{name => third}].
 [#{name => first},#{id => second},#{name => third}].
 
-> optic:put([optic_lists:all(), optic_maps:key(name)], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name)], example, Data).
 {ok,[#{name => example},#{id => second},#{name => example}]}
 
-> optic:put([optic_lists:all(), optic_maps:key(name, #{strict=>true})], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name, #{strict=>true})], example, Data).
 {error,undefined}
 
-> optic:put([optic_lists:all(), optic_maps:key(name, #{create=>undefined})], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name, #{create=>undefined})], example, Data).
 {ok,[#{name => example},
      #{id => second,name => example},
      #{name => example}]}
@@ -193,7 +193,7 @@ behaviour is context dependent and will vary based on the optic used.
 
 ```
 > optic:put([optic_lists:nth(3, #{create => #{}}),
-             optic_maps:key(name, #{create => undefined})], [], example).
+             optic_maps:key(name, #{create => undefined})], example, []).
 {ok,[#{},#{},#{name => example}]}
 '''
 
@@ -230,7 +230,7 @@ traversal functions.
 > optic:get(Path, Data).
 {ok,[<<"example">>]}
 
-> optic:put(Path, Data, <<"modified">>).
+> optic:put(Path, <<"modified">>, Data).
 {ok,#{<<"result">> => [#{<<"name">> => <<"modified">>}]}}
 '''
 
