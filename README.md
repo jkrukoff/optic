@@ -6,10 +6,11 @@
 ### Overview ###
 
 This is an Erlang/OTP library for retrieving and modifying nested values, in
-the spirit of [Haskell's
-lens library](https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references). Functional selectors for deeply nested values are
-constructed by composing "optics", each of which specifies a way to focus on a
-particular kind of value.
+the spirit of [Haskell's lens
+library](https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references).
+Functional selectors for deeply nested values are constructed by composing
+"optics", each of which specifies a way to focus on a particular kind of
+value.
 
 For example, say we had a list of deserialized JSON entities representing pets
 for sale that we wanted to modify.
@@ -29,8 +30,8 @@ We could then update all pets to a new status by:
 
 ```
 > optic:put([optic_lists:all(), optic_maps:key(<<"status">>)],
-            Pets,
-            <<"sold">>).
+            <<"sold">>,
+            Pets).
 {ok,[#{
   <<"id">> => 628178654,
   <<"name">> => <<"spot">>,
@@ -46,18 +47,26 @@ We could then update all pets to a new status by:
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_dict.md" class="module">optic_dict</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_gb_sets.md" class="module">optic_gb_sets</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_gb_trees.md" class="module">optic_gb_trees</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_generic.md" class="module">optic_generic</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_lists.md" class="module">optic_lists</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_maps.md" class="module">optic_maps</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_orddict.md" class="module">optic_orddict</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_ordsets.md" class="module">optic_ordsets</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_path.md" class="module">optic_path</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_proplists.md" class="module">optic_proplists</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_sets.md" class="module">optic_sets</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_tuples.md" class="module">optic_tuples</a></td></tr></table>
 
 
 ### Getting Started ###
 
-This library is published to [hex.pm](https://hex.pm) as [optic](https://hex.pm/packages/optic). If you're using [rebar3](https://www.rebar3.org/) as your build tool, it can be added
-as a dependency to your rebar.config as follows:
+This library is published to [hex.pm](https://hex.pm) as
+[optic](https://hex.pm/packages/optic). If you're using
+[rebar3](https://www.rebar3.org/) as your build tool, it can be added as a
+dependency to your rebar.config as follows:
 
 ```
 {deps, [{optic}]}.
@@ -94,28 +103,25 @@ Most of the optics in this library support the same set of options to control
 how they behave. Those options are passed as a map or proplist:
 
 * strict: When true, this causes an error to be returned when asked to
-traverse over a container of an unexpected type. When false or not given,
-unexpected containers will be silently skipped.
-
+  traverse over a container of an unexpected type. When false or not given,
+  unexpected containers will be silently skipped.
 * create: When given, this causes a new container of the expected type to be
-created when no container is present or when asked to traverse over a
-container of an unexpected type. If the traversal type needs to create
-individual values, the value of the create property is used as a template to
-create the needed default objects. Setting this property causes the optic to
-no longer be well behaved.
-
+  created when no container is present or when asked to traverse over a
+  container of an unexpected type. If the traversal type needs to create
+  individual values, the value of the create property is used as a template to
+  create the needed default objects. Setting this property causes the optic to
+  no longer be well behaved.
 * filter: When given, expects a value as a filter function to determine if
-the traversed element should be focused or skipped. The filter function should
-take a single arbitrary element and return a boolean true/false. If the
-criteria the filter function uses to select an element is modified, the
-filtered optic will no longer be well behaved.
-
+  the traversed element should be focused or skipped. The filter function should
+  take a single arbitrary element and return a boolean true/false. If the
+  criteria the filter function uses to select an element is modified, the
+  filtered optic will no longer be well behaved.
 * require: When given, expects a value as a filter function to determine if
-the traversed element can be focused. If the element can not be focused,
-`{error, required}` will be returned. The filter function should take a single
-arbitrary element and return a boolean true/false. If the criteria the filter
-function uses to select an element is modified, the filtered optic will no
-longer be well behaved.
+  the traversed element can be focused. If the element can not be focused,
+  `{error, required}` will be returned. The filter function should take a single
+  arbitrary element and return a boolean true/false. If the criteria the filter
+  function uses to select an element is modified, the filtered optic will no
+  longer be well behaved.
 
 
 #### Examples ####
@@ -183,11 +189,11 @@ Let's explore the variations in the context of modifying a container:
 ```
 > Data = [#{name => first},#{id => second},#{name => third}].
 [#{name => first},#{id => second},#{name => third}].
-> optic:put([optic_lists:all(), optic_maps:key(name)], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name)], example, Data).
 {ok,[#{name => example},#{id => second},#{name => example}]}
-> optic:put([optic_lists:all(), optic_maps:key(name, #{strict=>true})], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name, #{strict=>true})], example, Data).
 {error,undefined}
-> optic:put([optic_lists:all(), optic_maps:key(name, #{create=>undefined})], Data, example).
+> optic:put([optic_lists:all(), optic_maps:key(name, #{create=>undefined})], example, Data).
 {ok,[#{name => example},
      #{id => second,name => example},
      #{name => example}]}
@@ -199,7 +205,7 @@ behaviour is context dependent and will vary based on the optic used.
 
 ```
 > optic:put([optic_lists:nth(3, #{create => #{}}),
-             optic_maps:key(name, #{create => undefined})], [], example).
+             optic_maps:key(name, #{create => undefined})], example, []).
 {ok,[#{},#{},#{name => example}]}
 ```
 
@@ -236,7 +242,7 @@ traversal functions.
 > Path = optic_path:new([<<"result">>, '*', <<"name">>]),
 > optic:get(Path, Data).
 {ok,[<<"example">>]}
-> optic:put(Path, Data, <<"modified">>).
+> optic:put(Path, <<"modified">>, Data).
 {ok,#{<<"result">> => [#{<<"name">> => <<"modified">>}]}}
 ```
 
@@ -266,11 +272,10 @@ appreciated.
 
 ### Lineage ###
 
-I first encountered lenses via the
-[Datum](https://github.com/fogfish/datum) library, but wanted a
-version that supported traversables instead of lenses in order to support
-updating multiple elements. As lenses are a special case of traversables, this
-allowed for using a single type to represent both.
+I first encountered lenses via the [Datum](https://github.com/fogfish/datum)
+library, but wanted a version that supported traversables instead of lenses in
+order to support updating multiple elements. As lenses are a special case of
+traversables, this allowed for using a single type to represent both.
 
 There are a number of good introductions to lenses,
 [this](https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial)
@@ -284,4 +289,5 @@ implemented.
 ### Attribution ###
 
 Image by Bill Ebbesen
+
 CC BY-SA 3.0 [`https://creativecommons.org/licenses/by/3.0/deed.en`](https://creativecommons.org/licenses/by/3.0/deed.en)

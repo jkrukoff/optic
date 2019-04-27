@@ -1,0 +1,462 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module optic</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module optic</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>   
+A library for creating "optics", a composable traversal over   
+arbitrary containers with the possibility of error.
+
+
+<h2><a name="description">Description</a></h2><p>   
+A library for creating "optics", a composable traversal over   
+arbitrary containers with the possibility of error.</p>
+  
+   <p>The traversal is modeled as an opaque type containing both a fold   
+and mapfold type. As mapfold is a superset of fold, fold is   
+implemented for efficiency only. The usual fold and mapfold return   
+types are wrapped in ok/error tuples to represent the possibility   
+of failure, with the provided compositions being responsible for   
+propagating errors back out and skipping further execution.</p>
+  
+   These optics can then be composed to read and update nested data
+   structures. Three types of composition are possible. A wrap, which
+   modifies an existing optic into a new form. A chain, which
+   combines two optics so that one focuses on the value the previous
+   focuses on. Finally, a merge, which combines two optics to allow
+   both to focus over the same data.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-callback_filter">callback_filter()</a></h3>
+<p><tt>callback_filter() = fun((Elem::term()) -&gt; boolean())</tt></p>
+<p>  Callback function invoked by filter optics for each element of a
+  container.</p>
+
+<h3 class="typedecl"><a name="type-callback_fold">callback_fold()</a></h3>
+<p><tt>callback_fold() = fun((Elem::term(), NewAcc::term()) -&gt; Acc::term())</tt></p>
+<p>  Callback function invoked by fold for each element of a container.</p>
+
+<h3 class="typedecl"><a name="type-callback_map">callback_map()</a></h3>
+<p><tt>callback_map() = fun((Elem::term()) -&gt; NewElem::term())</tt></p>
+<p>  Callback function invoked by map for each element of a container.</p>
+
+<h3 class="typedecl"><a name="type-callback_mapfold">callback_mapfold()</a></h3>
+<p><tt>callback_mapfold() = fun((Elem::term(), Acc::term()) -&gt; {NewElem::term(), NewAcc::term()})</tt></p>
+<p>  Callback function invoked by mapfold for each element of a
+  container.</p>
+
+<h3 class="typedecl"><a name="type-callback_new">callback_new()</a></h3>
+<p><tt>callback_new() = fun((Data::term(), Template::term()) -&gt; NewData::term())</tt></p>
+<p>  Callback function invoked to create new containers.</p>
+
+<h3 class="typedecl"><a name="type-error">error()</a></h3>
+<p><tt>error() = {error, term()}</tt></p>
+<p>  The expected error format.</p>
+
+<h3 class="typedecl"><a name="type-optic">optic()</a></h3>
+<p><b>abstract datatype</b>: <tt>optic()</tt></p>
+<p>  A composable traversal over an arbitrary container.</p>
+
+<h3 class="typedecl"><a name="type-optic_fold">optic_fold()</a></h3>
+<p><tt>optic_fold() = fun((Fold::<a href="#type-callback_fold">callback_fold()</a>, Acc::term(), Data::term()) -&gt; <a href="#type-option">option</a>(NewAcc::term()))</tt></p>
+<p>  A fold function to be used as part of an optic.</p>
+
+<h3 class="typedecl"><a name="type-optic_mapfold">optic_mapfold()</a></h3>
+<p><tt>optic_mapfold() = fun((MapFold::<a href="#type-callback_mapfold">callback_mapfold()</a>, Acc::term(), Data::term()) -&gt; <a href="#type-option">option</a>({NewData::term(), NewAcc::term()}))</tt></p>
+<p>  A mapfold function to be used as part of an optic.</p>
+
+<h3 class="typedecl"><a name="type-optic_wrap">optic_wrap()</a></h3>
+<p><tt>optic_wrap(Over) = fun((Over) -&gt; Over)</tt></p>
+<p>  A mapping function to wrap optics.</p>
+
+<h3 class="typedecl"><a name="type-optic_wrap_fold">optic_wrap_fold()</a></h3>
+<p><tt>optic_wrap_fold() = <a href="#type-optic_wrap">optic_wrap</a>(<a href="#type-optic_fold">optic_fold()</a>)</tt></p>
+<p>  A mapping function over optic folds.</p>
+
+<h3 class="typedecl"><a name="type-optic_wrap_mapfold">optic_wrap_mapfold()</a></h3>
+<p><tt>optic_wrap_mapfold() = <a href="#type-optic_wrap">optic_wrap</a>(<a href="#type-optic_mapfold">optic_mapfold()</a>)</tt></p>
+<p>  A mapping function over optic mapfolds.</p>
+
+<h3 class="typedecl"><a name="type-optics">optics()</a></h3>
+<p><tt>optics() = [<a href="#type-optic">optic()</a>]</tt></p>
+<p>  A list of traversals to be composed.</p>
+
+<h3 class="typedecl"><a name="type-option">option()</a></h3>
+<p><tt>option(Success) = {ok, Success} | <a href="#type-error">error()</a></tt></p>
+<p>  A result type for operations that might fail.</p>
+
+<h3 class="typedecl"><a name="type-variations">variations()</a></h3>
+<p><tt>variations() = #{create =&gt; term(), strict =&gt; boolean(), filter =&gt; <a href="#type-callback_filter">callback_filter()</a>, require =&gt; <a href="#type-callback_filter">callback_filter()</a>} | <a href="proplists.html#type-proplist">proplists:proplist()</a></tt></p>
+<p>  Shared options to control optic construction.</p>
+
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#chain-1">chain/1</a></td><td>  
+Combine existing optics into a chain.</td></tr>
+<tr><td valign="top"><a href="#create-3">create/3</a></td><td>
+  Wrap an existing optic to cause it to create a new container when
+  the optic would otherwise return <code>{error, undefined}</code> or
+  <code>{error, required}</code> during a mapfold operation.</td></tr>
+<tr><td valign="top"><a href="#error-1">error/1</a></td><td>  
+Always errors with the given reason.</td></tr>
+<tr><td valign="top"><a href="#filter-1">filter/1</a></td><td>  
+Only focuses on the current data if the given filter function  
+returns true.</td></tr>
+<tr><td valign="top"><a href="#fold-4">fold/4</a></td><td>
+  Given a list of optics, performs a recursive fold over the result
+  of focusing on the given data structure.</td></tr>
+<tr><td valign="top"><a href="#get-2">get/2</a></td><td>
+  Given a list of optics, returns a list of the values focused on by
+  the final optic.</td></tr>
+<tr><td valign="top"><a href="#id-0">id/0</a></td><td>  
+Focus on what was given.</td></tr>
+<tr><td valign="top"><a href="#is_optic-1">is_optic/1</a></td><td>
+  Check if a term is an optic.</td></tr>
+<tr><td valign="top"><a href="#lax-1">lax/1</a></td><td>
+  Wrap an existing optic to cause it to skip an element when the
+  optic would otherwise return <code>{error, undefined}</code> or
+  <code>{error, required}</code> during a fold or mapfold operation.</td></tr>
+<tr><td valign="top"><a href="#map-3">map/3</a></td><td>
+  Given a list of optics, performs a recursive map over the result of
+  focusing on the given data structure.</td></tr>
+<tr><td valign="top"><a href="#mapfold-4">mapfold/4</a></td><td>
+  Given a list of optics, performs a recursive map and fold over the
+  result of focusing on the given data structure.</td></tr>
+<tr><td valign="top"><a href="#merge-1">merge/1</a></td><td>  
+Merge existing optics into a single optic.</td></tr>
+<tr><td valign="top"><a href="#new-1">new/1</a></td><td>  
+Create a new optic for traversing a data structure.</td></tr>
+<tr><td valign="top"><a href="#new-2">new/2</a></td><td>  
+Create a new optic for traversing a data structure.</td></tr>
+<tr><td valign="top"><a href="#put-3">put/3</a></td><td>
+  Given a list of optics, modifies the values focused on by
+  the final optic.</td></tr>
+<tr><td valign="top"><a href="#require-1">require/1</a></td><td>
+  Only focuses on the current data if the given filter function
+  returns true.</td></tr>
+<tr><td valign="top"><a href="#wrap-2">wrap/2</a></td><td>  
+Wrap an existing optic.</td></tr>
+<tr><td valign="top"><a href="#wrap-3">wrap/3</a></td><td>  
+Wrap an existing optic.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="chain-1">chain/1</a></h3>
+<div class="spec">
+<p><tt>chain(Optics) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li></ul></p>
+<p><tt>Optics</tt>: The list of optics to compose.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Combine existing optics into a chain. In left to right order, each  
+optic then focuses on the result of the previous optic. The result  
+of this composition is itself an optic.</p>
+ 
+  This is the default composition method used for functions which
+  accept optics.</p>
+
+<h3 class="function"><a name="create-3">create/3</a></h3>
+<div class="spec">
+<p><tt>create(Optic, New, Template) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optic = <a href="#type-optic">optic()</a></tt></li><li><tt>New = <a href="#type-callback_new">callback_new()</a></tt></li><li><tt>Template = term()</tt></li></ul></p>
+<p><tt>Optic</tt>: The existing optic to wrap.<br>
+<tt>New</tt>: The callback function to apply when the mapfold fails.
+  Must take two arguments, the existing data and a template argument
+  to use to populate the new data. Should return the new container,
+  which will immediately have the wrapped mapfold function re-applied
+  after creation.<br>
+<tt>Template</tt>: The template value to be given to the callback function.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p>
+  Wrap an existing optic to cause it to create a new container when
+  the optic would otherwise return <code>{error, undefined}</code> or
+  <code>{error, required}</code> during a mapfold operation.</p>
+
+<h3 class="function"><a name="error-1">error/1</a></h3>
+<div class="spec">
+<p><tt>error(Reason) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Reason = term()</tt></li></ul></p>
+<p><tt>Reason</tt>: The error description to return.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Always errors with the given reason.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic:error(reason)], anything).
+  {error, reason}</pre></p>
+
+<h3 class="function"><a name="filter-1">filter/1</a></h3>
+<div class="spec">
+<p><tt>filter(Filter) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Filter = <a href="#type-callback_filter">callback_filter()</a></tt></li></ul></p>
+<p><tt>Filter</tt>: The filter function to invoke to determine if the element should be
+  focused. Takes the current data as an argument, returns a boolean
+  true or false.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Only focuses on the current data if the given filter function  
+returns true. Otherwise the data is skipped.</p>
+ 
+  <p>Can fail to be well behaved depending on if the filter criteria is  
+part of the focus.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; IsOdd = fun (Elem) -&gt; Elem % 2 == 1 end,
+  &gt; optic:get([optic:filter(IsOdd)], [1,2,3]).
+  {ok, [1,3]}</pre></p>
+
+<h3 class="function"><a name="fold-4">fold/4</a></h3>
+<div class="spec">
+<p><tt>fold(Optics, Fold, Acc, Data) -&gt; <a href="#type-option">option</a>(NewAcc)</tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li><li><tt>Fold = <a href="#type-callback_fold">callback_fold()</a></tt></li><li><tt>Acc = term()</tt></li><li><tt>Data = term()</tt></li><li><tt>NewAcc = term()</tt></li></ul></p>
+<p><tt>Optics</tt>: A list of optics to apply. Leftmost is applied first.<br>
+<tt>Fold</tt>: The callback function to invoke on the focused elements and
+  accumulator. Expected to return the modified accumulator.<br>
+<tt>Acc</tt>: The initial accumulator value.<br>
+<tt>Data</tt>: The container to apply the optics to.<br>
+</p>
+<p>returns: 
+  On success, returns a tuple of ok and the final accumulator value.
+  On failure, returns an error tuple.</p>
+</div><p>
+  Given a list of optics, performs a recursive fold over the result
+  of focusing on the given data structure. The order of traversal is
+  determined by the optics used.</p>
+
+<h3 class="function"><a name="get-2">get/2</a></h3>
+<div class="spec">
+<p><tt>get(Optics, Data) -&gt; <a href="#type-option">option</a>(Values)</tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li><li><tt>Data = term()</tt></li><li><tt>Values = [term()]</tt></li></ul></p>
+<p><tt>Optics</tt>: A list of optics to apply. Leftmost is applied first.<br>
+<tt>Data</tt>: The container to apply the optics to.<br>
+</p>
+<p>returns: A list of the focused values.</p>
+</div><p>
+  Given a list of optics, returns a list of the values focused on by
+  the final optic.</p>
+
+<h3 class="function"><a name="id-0">id/0</a></h3>
+<div class="spec">
+<p><tt>id() -&gt; <a href="#type-optic">optic()</a></tt><br></p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Focus on what was given.</p>
+ 
+  <p>This is the identity optic, it can be chained with any other optic  
+and will return the same optic.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic:id()], anything).
+  {ok,[anything]}</pre></p>
+
+<h3 class="function"><a name="is_optic-1">is_optic/1</a></h3>
+<div class="spec">
+<p><tt>is_optic(Candidate) -&gt; boolean()</tt>
+<ul class="definitions"><li><tt>Candidate = term()</tt></li></ul></p>
+<p><tt>Candidate</tt>: The term to test.<br>
+</p>
+<p>returns: A boolean flag.</p>
+</div><p>
+  Check if a term is an optic.</p>
+
+<h3 class="function"><a name="lax-1">lax/1</a></h3>
+<div class="spec">
+<p><tt>lax(Optic) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optic = <a href="#type-optic">optic()</a></tt></li></ul></p>
+<p><tt>Optic</tt>: The existing optic to wrap.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p>
+  Wrap an existing optic to cause it to skip an element when the
+  optic would otherwise return <code>{error, undefined}</code> or
+  <code>{error, required}</code> during a fold or mapfold operation.</p>
+
+<h3 class="function"><a name="map-3">map/3</a></h3>
+<div class="spec">
+<p><tt>map(Optics, Map, Data) -&gt; <a href="#type-option">option</a>(NewData)</tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li><li><tt>Map = <a href="#type-callback_map">callback_map()</a></tt></li><li><tt>Data = term()</tt></li><li><tt>NewData = term()</tt></li></ul></p>
+<p><tt>Optics</tt>: A list of optics to apply. Leftmost is applied first.<br>
+<tt>Map</tt>: The callback function to invoke on the focused elements. Expected
+  to return a modified element.<br>
+<tt>Data</tt>: The container to apply the optics to.<br>
+</p>
+<p>returns: 
+  On success, returns a tuple of ok and the modified container.
+  On failure, returns an error tuple.</p>
+</div><p>
+  Given a list of optics, performs a recursive map over the result of
+  focusing on the given data structure.</p>
+
+<h3 class="function"><a name="mapfold-4">mapfold/4</a></h3>
+<div class="spec">
+<p><tt>mapfold(Optics, MapFold, Acc, Data) -&gt; <a href="#type-option">option</a>({NewData, NewAcc})</tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li><li><tt>MapFold = <a href="#type-callback_mapfold">callback_mapfold()</a></tt></li><li><tt>Acc = term()</tt></li><li><tt>Data = term()</tt></li><li><tt>NewData = term()</tt></li><li><tt>NewAcc = term()</tt></li></ul></p>
+<p><tt>Optics</tt>: A list of optics to apply. Leftmost is applied first.<br>
+<tt>MapFold</tt>: The callback function to invoke on the focused elements and
+  accumulator. Expected to return a tuple of the modified element and
+  accumulator.<br>
+<tt>Acc</tt>: The initial accumulator value.<br>
+<tt>Data</tt>: The container to apply the optics to.<br>
+</p>
+<p>returns: 
+  On success, returns a tuple of ok and a tuple of the modified
+  container and the final accumulator value. On failure, returns an
+  error tuple.</p>
+</div><p>
+  Given a list of optics, performs a recursive map and fold over the
+  result of focusing on the given data structure.</p>
+
+<h3 class="function"><a name="merge-1">merge/1</a></h3>
+<div class="spec">
+<p><tt>merge(Optics) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li></ul></p>
+<p><tt>Optics</tt>: The list of optics to compose.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Merge existing optics into a single optic. In left to right order,  
+each optic focuses on the same data. The result of this composition  
+is itself an optic.</p>
+ 
+  It is the optic product type.</p>
+
+<h3 class="function"><a name="new-1">new/1</a></h3>
+<div class="spec">
+<p><tt>new(MapFold) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>MapFold = <a href="#type-optic_mapfold">optic_mapfold()</a></tt></li></ul></p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Create a new optic for traversing a data structure.</p>
+ 
+  This is the less efficient form of optic construction and will
+  infer a fold function from the given mapfold function.</p>
+<p><b>See also:</b> <a href="#new-2">new/2</a>.</p>
+
+<h3 class="function"><a name="new-2">new/2</a></h3>
+<div class="spec">
+<p><tt>new(MapFold, Fold) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>MapFold = <a href="#type-optic_mapfold">optic_mapfold()</a></tt></li><li><tt>Fold = <a href="#type-optic_fold">optic_fold()</a></tt></li></ul></p>
+<p><tt>MapFold</tt>: At a minimum, an optic requires a mapfold function to be provided
+  for both collecting and modifying values. This function must take
+  three arguments; a callback function, an initial accumulator value
+  and an arbitrary structure to traverse. The callback function will
+  expect two values; an element and the current accumulator. It will
+  return a two item tuple with the modified element and the modified
+  accumulator. The mapfold function will return a two item tuple with
+  the modified structure and the final accumulator value, wrapped in
+  an ok or error tagged tuple.<br>
+<tt>Fold</tt>: A fold function can also be provided for more efficient traversal
+  without modification. If one is not provided, it will be
+  inefficiently inferred from the MapFold function. This function
+  must take three arguments; a callback function, an initial
+  accumulator value and an arbitrary structure to traverse. The
+  callback function will expect two values; an element and the
+  current accumulator. It will return the modified accumulator. The
+  fold function will return a final accumulator value, wrapped in an
+  ok or error tagged tuple.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Create a new optic for traversing a data structure.</p>
+ 
+  <p>Well behaved optics should implement the following properties:</p>
+ 
+  <ul>
+  <li>Get -&gt; Put: Writing the same value as was read should result in
+  the original structure.</li>
+  <li>Put -&gt; Get: Reading a value that was written should result in
+  the same value as was written.</li>
+  <li>Put -&gt; Put: Writing a value twice should result in only the
+  last written value.</li>
+  </ul>
+ 
+  Optics which are not well behaved will be more difficult to use and
+  compose with other optics. Their behaviour will change depending on
+  the order in which they are applied and the number of times they
+  are applied.
+ </p>
+
+<h3 class="function"><a name="put-3">put/3</a></h3>
+<div class="spec">
+<p><tt>put(Optics, Value, Data) -&gt; <a href="#type-option">option</a>(NewData)</tt>
+<ul class="definitions"><li><tt>Optics = <a href="#type-optics">optics()</a></tt></li><li><tt>Value = term()</tt></li><li><tt>Data = term()</tt></li><li><tt>NewData = term()</tt></li></ul></p>
+<p><tt>Optics</tt>: A list of optics to apply. Leftmost is applied first.<br>
+<tt>Data</tt>: The container to apply the optics to.<br>
+</p>
+<p>returns: 
+  On success, returns a tuple of ok and the modified container.
+  On failure, returns an error tuple.</p>
+</div><p>
+  Given a list of optics, modifies the values focused on by
+  the final optic.</p>
+
+<h3 class="function"><a name="require-1">require/1</a></h3>
+<div class="spec">
+<p><tt>require(Filter) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Filter = <a href="#type-callback_filter">callback_filter()</a></tt></li></ul></p>
+<p><tt>Filter</tt>: The filter function to invoke to determine if the element should be
+  focused. Takes the current data as an argument, returns a boolean
+  true or false.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p>
+  Only focuses on the current data if the given filter function
+  returns true. Otherwise an <code>{error, required}` is returned.
+ 
+  Can fail to be well behaved depending on if the filter criteria is
+  part of the focus.
+ 
+  Example:
+ 
+  ```
+  &gt; IsOdd = fun (Elem) -&gt; Elem % 2 == 1 end,
+  &gt; optic:get([optic:require(IsOdd)], [1,2,3]).
+  {error, required}</code>''</p>
+
+<h3 class="function"><a name="wrap-2">wrap/2</a></h3>
+<div class="spec">
+<p><tt>wrap(Optic, WrapMapFold) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optic = <a href="#type-optic">optic()</a></tt></li><li><tt>WrapMapFold = <a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a></tt></li></ul></p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Wrap an existing optic.</p>
+ 
+  This is the less efficient form of optic construction and will
+  infer a fold wrapper from the given mapfold wrapper.</p>
+<p><b>See also:</b> <a href="#wrap-3">wrap/3</a>.</p>
+
+<h3 class="function"><a name="wrap-3">wrap/3</a></h3>
+<div class="spec">
+<p><tt>wrap(Optic, WrapMapFold, WrapFold) -&gt; <a href="#type-optic">optic()</a></tt>
+<ul class="definitions"><li><tt>Optic = <a href="#type-optic">optic()</a></tt></li><li><tt>WrapMapFold = <a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a></tt></li><li><tt>WrapFold = <a href="#type-optic_wrap_fold">optic_wrap_fold()</a></tt></li></ul></p>
+<p><tt>Optic</tt>: An existing optic to modify.<br>
+<tt>WrapMapFold</tt>: A mapping function to apply to the optic's mapfold function.<br>
+<tt>WrapFold</tt>: A mapping function to apply to the optic's fold function.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Wrap an existing optic.</p>
+ 
+  This allows for modifying or replacing the methods of an existing
+  optic by applying a mapping function to each of the mapfold and
+  fold methods.</p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

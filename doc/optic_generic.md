@@ -36,9 +36,10 @@ Focus on the value of many different key/value like mappings.</td></tr></table>
 ### index/1 ###
 
 <pre><code>
-index(Index::non_neg_integer()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+index(Index) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Index = non_neg_integer()</code></li></ul>
 
 `Index`: The one based index of the element to focus on.<br />
 
@@ -60,9 +61,10 @@ Example:
 ### key/1 ###
 
 <pre><code>
-key(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+key(Key) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Key = term()</code></li></ul>
 
 `Key`: The key to focus on.<br />
 

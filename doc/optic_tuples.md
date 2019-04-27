@@ -38,9 +38,10 @@ __See also:__ [all/1](#all-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 
@@ -60,9 +61,10 @@ Example:
 ### element/1 ###
 
 <pre><code>
-element(N::pos_integer()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+element(N) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>N = pos_integer()</code></li></ul>
 
 __See also:__ [element/2](#element-2).
 
@@ -71,9 +73,10 @@ __See also:__ [element/2](#element-2).
 ### element/2 ###
 
 <pre><code>
-element(N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+element(N, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>N = pos_integer()</code></li><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `N`: The index of the tuple element to focus on.<br />`Options`: Common optic options.<br />
 
@@ -94,9 +97,10 @@ Example:
 ### field/3 ###
 
 <pre><code>
-field(Tag::atom(), Size::pos_integer(), N::pos_integer()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+field(Tag, Size, N) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Tag = atom()</code></li><li><code>Size = pos_integer()</code></li><li><code>N = pos_integer()</code></li></ul>
 
 __See also:__ [field/4](#field-4).
 
@@ -105,9 +109,10 @@ __See also:__ [field/4](#field-4).
 ### field/4 ###
 
 <pre><code>
-field(Tag::atom(), Size::pos_integer(), N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+field(Tag, Size, N, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Tag = atom()</code></li><li><code>Size = pos_integer()</code></li><li><code>N = pos_integer()</code></li><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Tag`: The expected record tag.<br />`Size`: The expected record size.<br />`N`: The index of the field in the record tuple.<br />`Options`: Common optic options.<br />
 

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>optic</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<h1>optic</h1>
+<p>Copyright © 2019 John Krukoff</p>
+<p><b>Version:</b> 3.0.0</p>
+<p><b>Authors:</b> John Krukoff (<a href="mailto:github@cultist.org"><tt>github@cultist.org</tt></a>).</p>
+<h3>Overview</h3>
+
+<p><img src="lenses.jpg" alt="Camera Lenses"></p>
+
+<p>This is an Erlang/OTP library for retrieving and modifying nested values, in
+the spirit of <a href="https://en.wikibooks.org/wiki/Haskell/Lenses_and_functional_references">Haskell's
+lens library</a>. Functional selectors for deeply nested values are
+constructed by composing "optics", each of which specifies a way to focus on a
+particular kind of value.</p>
+
+<p>For example, say we had a list of deserialized JSON entities representing pets
+for sale that we wanted to modify.</p>
+
+<pre>   
+&gt; Pets = [#{
+    &lt;&lt;"id"&gt;&gt; =&gt; 628178654,
+    &lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"spot"&gt;&gt;,
+    &lt;&lt;"status"&gt;&gt; =&gt; &lt;&lt;"available"&gt;&gt;,
+    &lt;&lt;"category"&gt;&gt; =&gt; #{
+      &lt;&lt;"id"&gt;&gt; =&gt; 3216199393,
+      &lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"dog"&gt;&gt;
+    }}].</pre>
+
+<p>We could then update all pets to a new status by:</p>
+
+<pre>   
+&gt; optic:put([optic_lists:all(), optic_maps:key(&lt;&lt;"status"&gt;&gt;)],
+            &lt;&lt;"sold"&gt;&gt;,
+            Pets).
+
+{ok,[#{
+  &lt;&lt;"id"&gt;&gt; =&gt; 628178654,
+  &lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"spot"&gt;&gt;,
+  &lt;&lt;"status"&gt;&gt; =&gt; &lt;&lt;"sold"&gt;&gt;,
+  &lt;&lt;"category"&gt;&gt; =&gt; #{
+    &lt;&lt;"id"&gt;&gt; =&gt; 3216199393,
+    &lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"dog"&gt;&gt;
+  }}]}</pre>
+
+<h3>Getting Started</h3>
+
+<p>This library is published to <a href="https://hex.pm">hex.pm</a> as <a href="https://hex.pm/packages/optic">optic</a>. If you're using <a href="https://www.rebar3.org/">rebar3</a> as your build tool, it can be added
+as a dependency to your rebar.config as follows:</p>
+
+<pre>   
+{deps, [{optic}]}.</pre>
+
+<h3>Usage</h3>
+
+<p>The library is expected to be used by first creating a list of <em>optics</em>
+which represent operations on particular kinds of containers. That list can
+then be used with a variety of different common operations in the library for
+reading or writing values in nested data structures in different ways.</p>
+
+<h4>Optics</h4>
+
+<p>An optic is an opaque record that represents a method for traversing over and
+modifying a particular container. Many different pre-created optics are
+included in the library for standard Erlang containers as well as a method for
+creating new optics.</p>
+
+<p>The fundamental operation supported is a mapfold, though a fold may also be
+implemented (and is recommended) for better performance for read only
+operations. Additionally convenience functions for getting and putting static
+values are included and are built on top of the more powerful primitive
+operations.</p>
+
+<p>Optics which are associative and idempotent are well behaved. These optics
+can be easily combined in any way this library supports without surprise.
+Optics which do not have these properties will require careful attention to
+how they are used and the order in which they are applied.</p>
+
+<p>Most of the optics in this library support the same set of options to control
+how they behave. Those options are passed as a map or proplist:</p>
+
+<ul>
+<li>strict: When true, this causes an error to be returned when asked to
+traverse over a container of an unexpected type. When false or not given,
+unexpected containers will be silently skipped.</li>
+<li>create: When given, this causes a new container of the expected type to be
+created when no container is present or when asked to traverse over a
+container of an unexpected type. If the traversal type needs to create
+individual values, the value of the create property is used as a template to
+create the needed default objects. Setting this property causes the optic to
+no longer be well behaved.</li>
+<li>filter: When given, expects a value as a filter function to determine if
+the traversed element should be focused or skipped. The filter function should
+take a single arbitrary element and return a boolean true/false. If the
+criteria the filter function uses to select an element is modified, the
+filtered optic will no longer be well behaved.</li>
+<li>require: When given, expects a value as a filter function to determine if
+the traversed element can be focused. If the element can not be focused,
+<code>{error, required}</code> will be returned. The filter function should take a single
+arbitrary element and return a boolean true/false. If the criteria the filter
+function uses to select an element is modified, the filtered optic will no
+longer be well behaved.</li>
+</ul>
+
+<h4>Examples</h4>
+
+<p>Let's look at some examples of how optics can be used. We'll start with a list
+of maps and demonstrate various ways it can be processed:</p>
+
+<pre>   
+&gt; Data = [#{name =&gt; first}, #{name =&gt; second}, #{name =&gt; third}].</pre>
+
+<p>We can extract a single value using one of the lists optics to extract the
+head of the list, and combine it with an optic to extract the value of the
+"name" key from the map.</p>
+
+<pre>   
+&gt; optic:get([optic_lists:head(), optic_maps:key(name)], Data).
+{ok,[first]}</pre>
+
+<p>This shows how optics are applied from left to right.</p>
+
+<p>If we wanted to traverse over all the members of the list, we can simply
+change the list optic used to do so:</p>
+
+<pre>   
+&gt; optic:get([optic_lists:all(), optic_maps:key(name)], Data).
+{ok,[first,second,third]}</pre>
+
+<p>Optics can also be composed using <code>optic:merge/1</code> in order to select
+multiple elements at the same level. For instance, to select only the first
+two maps, we could do this:</p>
+
+<pre>   
+&gt; FirstTwo = optic:merge([optic_lists:nth(1), optic_lists:nth(2)]),
+&gt; optic:get([FirstTwo, optic_maps:key(name)], Data).
+{ok,[first,second]}</pre>
+
+<p>When presented with heterogeneous data, the strict option can be used to
+control how it is handled. We may want to simply skip it when such is
+expected, or we may want to report an error. The only change is in how the
+optic is constructed:</p>
+
+<pre>   
+&gt; Data = [#{name =&gt; first},#{id =&gt; second},#{name =&gt; third}].
+[#{name =&gt; first},#{id =&gt; second},#{name =&gt; third}].
+
+&gt; optic:get([optic_lists:all(), optic_maps:key(name)], Data).
+{ok,[first,third]}
+
+&gt; optic:get([optic_lists:all(), optic_maps:key(name, #{strict =&gt; false})], Data).
+{ok,[first,third]} 
+
+&gt; optic:get([optic_lists:all(), optic_maps:key(name, #{strict =&gt; true})], Data).
+{error,undefined}</pre>
+
+<p>We can see here that we get lax handling of unexpected types by default.</p>
+
+<p>The create option is closely related, as creation is only triggered in cases
+where strict would have returned an error. In that case a container is instead
+either constructed or modified to allow the operation to succeed.</p>
+
+<p>Let's explore the variations in the context of modifying a container:</p>
+
+<pre>   
+&gt; Data = [#{name =&gt; first},#{id =&gt; second},#{name =&gt; third}].
+[#{name =&gt; first},#{id =&gt; second},#{name =&gt; third}].
+
+&gt; optic:put([optic_lists:all(), optic_maps:key(name)], example, Data).
+{ok,[#{name =&gt; example},#{id =&gt; second},#{name =&gt; example}]}
+
+&gt; optic:put([optic_lists:all(), optic_maps:key(name, #{strict=&gt;true})], example, Data).
+{error,undefined}
+
+&gt; optic:put([optic_lists:all(), optic_maps:key(name, #{create=&gt;undefined})], example, Data).
+{ok,[#{name =&gt; example},
+     #{id =&gt; second,name =&gt; example},
+     #{name =&gt; example}]}</pre>
+
+<p>The value given to create is used as a template when additional values need to
+be constructed. In many cases, it is then immediately overwritten. The
+behaviour is context dependent and will vary based on the optic used.</p>
+
+<pre>   
+&gt; optic:put([optic_lists:nth(3, #{create =&gt; #{}}),
+             optic_maps:key(name, #{create =&gt; undefined})], example, []).
+{ok,[#{},#{},#{name =&gt; example}]}</pre>
+
+<p>Finally, the filter option can be used to control which elements are selected
+based on their values. For instance, say we wanted to only collect the status
+of maps with a particular name:</p>
+
+<pre>   
+&gt; Data = [#{name =&gt; first, status =&gt; ready},
+          #{name =&gt; second, status =&gt; ready},
+          #{name =&gt; third, status =&gt; delayed}].
+[#{name =&gt; first,status =&gt; ready},
+ #{name =&gt; second,status =&gt; ready},
+ #{name =&gt; third,status =&gt; delayed}]
+&gt; optic:get([optic_lists:all([{filter,
+                               fun (Elem) -&gt; maps:get(name, Elem) == third end}]),
+             optic_maps:key(status)], Data).
+{ok,[delayed]}</pre>
+
+<p>More complicated operations should refer to the <code>fold/4</code>, <code>map/3</code> and
+<code>mapfold/4</code> functions to allow for values to be computed during the traversal.</p>
+
+<h4>Paths</h4>
+
+<p>For traversing JSON like structures of maps and lists, the <code>optic_path</code> module
+provides a simplified interface for optic construction. It parses a list of
+path components into a list of optics that can be used with any of the optic
+traversal functions.</p>
+
+<pre>   
+&gt; Data = #{&lt;&lt;"result"&gt;&gt; =&gt; [#{&lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"example"&gt;&gt;}]},
+&gt; Path = optic_path:new([&lt;&lt;"result"&gt;&gt;, '*', &lt;&lt;"name"&gt;&gt;]),
+&gt; optic:get(Path, Data).
+{ok,[&lt;&lt;"example"&gt;&gt;]}
+
+&gt; optic:put(Path, &lt;&lt;"modified"&gt;&gt;, Data).
+{ok,#{&lt;&lt;"result"&gt;&gt; =&gt; [#{&lt;&lt;"name"&gt;&gt; =&gt; &lt;&lt;"modified"&gt;&gt;}]}}</pre>
+
+<p>Notable restrictions for paths are they require map-like keys to be strings or
+binaries. No provision is made for the usual optic options, instead traversal
+is always lax and creation is never done.</p>
+
+<h3>Contributing</h3>
+
+<p>Please fork the repo and submit a PR. Tests are run via:</p>
+
+<pre>   
+rebar3 eunit</pre>
+
+<p>Documentation is autogenerated using edown and edoc via:</p>
+
+<pre>   
+rebar3 as markdown edoc</pre>
+
+<p>The application has only been tested with Erlang/OTP 21 on Windows 10. Reports
+of success (or failure!) on other versions and operating systems are
+appreciated.</p>
+
+<h3>Lineage</h3>
+
+<p>I first encountered lenses via the
+<a href="https://github.com/fogfish/datum">Datum</a> library, but wanted a
+version that supported traversables instead of lenses in order to support
+updating multiple elements. As lenses are a special case of traversables, this
+allowed for using a single type to represent both.</p>
+
+<p>There are a number of good introductions to lenses,
+<a href="https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/a-little-lens-starter-tutorial">this</a>
+was the most accessible for me.</p>
+
+<p>This library was initially conceived with the intention of making it easy to
+modify deeply nested JSON, so JSON related data structures were the first
+implemented.</p>
+
+<h3>Attribution</h3>
+
+Image by Bill Ebbesen
+CC BY-SA 3.0 <a href="https://creativecommons.org/licenses/by/3.0/deed.en" target="_top"><tt>https://creativecommons.org/licenses/by/3.0/deed.en</tt></a>
+
+<hr>
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

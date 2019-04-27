@@ -39,9 +39,10 @@ __See also:__ [all/1](#all-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 
@@ -72,9 +73,10 @@ __See also:__ [head/1](#head-1).
 ### head/1 ###
 
 <pre><code>
-head(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+head(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 
@@ -95,9 +97,10 @@ Example:
 ### nth/1 ###
 
 <pre><code>
-nth(N::pos_integer()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+nth(N) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>N = pos_integer()</code></li></ul>
 
 __See also:__ [nth/2](#nth-2).
 
@@ -106,9 +109,10 @@ __See also:__ [nth/2](#nth-2).
 ### nth/2 ###
 
 <pre><code>
-nth(N::pos_integer(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+nth(N, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>N = pos_integer()</code></li><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `N`: The index of the list element to focus on.<br />`Options`: Common optic options.<br />
 
@@ -140,9 +144,10 @@ __See also:__ [tail/1](#tail-1).
 ### tail/1 ###
 
 <pre><code>
-tail(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+tail(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 

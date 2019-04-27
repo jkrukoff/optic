@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module optic_lists</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module optic_lists</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+   A set of optics specific to lists.
+
+
+<h2><a name="description">Description</a></h2>
+   A set of optics specific to lists.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#all-0">all/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#all-1">all/1</a></td><td>  
+Focus on all elements of a list.</td></tr>
+<tr><td valign="top"><a href="#head-0">head/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#head-1">head/1</a></td><td>  
+Focus on the head of a list.</td></tr>
+<tr><td valign="top"><a href="#nth-1">nth/1</a></td><td></td></tr>
+<tr><td valign="top"><a href="#nth-2">nth/2</a></td><td>
+  Focus on the nth element of a list.</td></tr>
+<tr><td valign="top"><a href="#tail-0">tail/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#tail-1">tail/1</a></td><td>  
+Focus on the tail of a list.</td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="all-0">all/0</a></h3>
+<div class="spec">
+<p><tt>all() -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt><br></p>
+</div>
+<p><b>See also:</b> <a href="#all-1">all/1</a>.</p>
+
+<h3 class="function"><a name="all-1">all/1</a></h3>
+<div class="spec">
+<p><tt>all(Options) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Options = <a href="optic.html#type-variations">optic:variations()</a></tt></li></ul></p>
+<p><tt>Options</tt>: Common optic options.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Focus on all elements of a list.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic_lists:all()], [1,2,3]).
+  {ok,[1,2,3]}</pre></p>
+
+<h3 class="function"><a name="head-0">head/0</a></h3>
+<div class="spec">
+<p><tt>head() -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt><br></p>
+</div>
+<p><b>See also:</b> <a href="#head-1">head/1</a>.</p>
+
+<h3 class="function"><a name="head-1">head/1</a></h3>
+<div class="spec">
+<p><tt>head(Options) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Options = <a href="optic.html#type-variations">optic:variations()</a></tt></li></ul></p>
+<p><tt>Options</tt>: Common optic options.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Focus on the head of a list. The list must have at least one  
+element to have a head.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic_lists:head()], [1,2,3]).
+  {ok,[1]}</pre></p>
+
+<h3 class="function"><a name="nth-1">nth/1</a></h3>
+<div class="spec">
+<p><tt>nth(N) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>N = pos_integer()</tt></li></ul></p>
+</div>
+<p><b>See also:</b> <a href="#nth-2">nth/2</a>.</p>
+
+<h3 class="function"><a name="nth-2">nth/2</a></h3>
+<div class="spec">
+<p><tt>nth(N, Options) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>N = pos_integer()</tt></li><li><tt>Options = <a href="optic.html#type-variations">optic:variations()</a></tt></li></ul></p>
+<p><tt>N</tt>: The index of the list element to focus on.<br>
+<tt>Options</tt>: Common optic options.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>
+  Focus on the nth element of a list. As with <code>lists:nth/2</code>, indexing  
+begins at 1.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic_lists:nth(1)], [1,2,3]).
+  {ok,[1]}</pre></p>
+
+<h3 class="function"><a name="tail-0">tail/0</a></h3>
+<div class="spec">
+<p><tt>tail() -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt><br></p>
+</div>
+<p><b>See also:</b> <a href="#tail-1">tail/1</a>.</p>
+
+<h3 class="function"><a name="tail-1">tail/1</a></h3>
+<div class="spec">
+<p><tt>tail(Options) -&gt; <a href="optic.html#type-optic">optic:optic()</a></tt>
+<ul class="definitions"><li><tt>Options = <a href="optic.html#type-variations">optic:variations()</a></tt></li></ul></p>
+<p><tt>Options</tt>: Common optic options.<br>
+</p>
+<p>returns: An opaque optic record.</p>
+</div><p><p>  
+Focus on the tail of a list. A list must have at least one element  
+to have a tail.</p>
+ 
+  <p>Example:</p>
+ 
+  <pre>  &gt; optic:get([optic_lists:tail()], [1,2,3]).
+  {ok,[2,3]}</pre></p>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

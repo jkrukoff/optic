@@ -53,9 +53,10 @@ Construct a list of optics from a path.</td></tr></table>
 ### new/1 ###
 
 <pre><code>
-new(Paths::<a href="#type-paths">paths()</a>) -&gt; <a href="optic.md#type-optics">optic:optics()</a>
+new(Paths) -&gt; <a href="optic.md#type-optics">optic:optics()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Paths = <a href="#type-paths">paths()</a></code></li></ul>
 
 `Paths`: A list of path components to convert.<br />
 

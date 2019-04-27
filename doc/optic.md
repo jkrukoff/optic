@@ -191,7 +191,7 @@ option(Success) = {ok, Success} | <a href="#type-error">error()</a>
 
 
 <pre><code>
-variations() = #{create =&gt; term(), strict =&gt; boolean(), filter =&gt; <a href="#type-callback_filter">callback_filter()</a>, require =&gt; <a href="#type-callback_filter">callback_filter()</a>} | [<a href="proplists.md#type-property">proplists:property()</a>]
+variations() = #{create =&gt; term(), strict =&gt; boolean(), filter =&gt; <a href="#type-callback_filter">callback_filter()</a>, require =&gt; <a href="#type-callback_filter">callback_filter()</a>} | <a href="proplists.md#type-proplist">proplists:proplist()</a>
 </code></pre>
 
  Shared options to control optic construction.
@@ -242,9 +242,10 @@ Wrap an existing optic.</td></tr></table>
 ### chain/1 ###
 
 <pre><code>
-chain(Optics::<a href="#type-optics">optics()</a>) -&gt; <a href="#type-optic">optic()</a>
+chain(Optics) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li></ul>
 
 `Optics`: The list of optics to compose.<br />
 
@@ -262,9 +263,10 @@ accept optics.
 ### create/3 ###
 
 <pre><code>
-create(Optic::<a href="#type-optic">optic()</a>, New::<a href="#type-callback_new">callback_new()</a>, Template::term()) -&gt; <a href="#type-optic">optic()</a>
+create(Optic, New, Template) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optic = <a href="#type-optic">optic()</a></code></li><li><code>New = <a href="#type-callback_new">callback_new()</a></code></li><li><code>Template = term()</code></li></ul>
 
 `Optic`: The existing optic to wrap.<br />`New`: The callback function to apply when the mapfold fails.
   Must take two arguments, the existing data and a template argument
@@ -283,9 +285,10 @@ the optic would otherwise return `{error, undefined}` or
 ### error/1 ###
 
 <pre><code>
-error(Reason::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+error(Reason) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Reason = term()</code></li></ul>
 
 `Reason`: The error description to return.<br />
 
@@ -305,9 +308,10 @@ Example:
 ### filter/1 ###
 
 <pre><code>
-filter(Filter::<a href="#type-callback_filter">callback_filter()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+filter(Filter) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Filter = <a href="#type-callback_filter">callback_filter()</a></code></li></ul>
 
 `Filter`: The filter function to invoke to determine if the element should be
   focused. Takes the current data as an argument, returns a boolean
@@ -334,12 +338,13 @@ Example:
 ### fold/4 ###
 
 <pre><code>
-fold(Optics::<a href="#type-optics">optics()</a>, Data::term(), Fold::<a href="#type-callback_fold">callback_fold()</a>, Acc::term()) -&gt; <a href="#type-option">option</a>(NewAcc::term())
+fold(Optics, Fold, Acc, Data) -&gt; <a href="#type-option">option</a>(NewAcc)
 </code></pre>
-<br />
 
-`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`Fold`: The callback function to invoke on the focused elements and
-  accumulator. Expected to return the modified accumulator.<br />`Acc`: The initial accumulator value.<br />
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li><li><code>Fold = <a href="#type-callback_fold">callback_fold()</a></code></li><li><code>Acc = term()</code></li><li><code>Data = term()</code></li><li><code>NewAcc = term()</code></li></ul>
+
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Fold`: The callback function to invoke on the focused elements and
+  accumulator. Expected to return the modified accumulator.<br />`Acc`: The initial accumulator value.<br />`Data`: The container to apply the optics to.<br />
 
 returns: 
 On success, returns a tuple of ok and the final accumulator value.
@@ -354,9 +359,10 @@ determined by the optics used.
 ### get/2 ###
 
 <pre><code>
-get(Optics::<a href="#type-optics">optics()</a>, Data::term()) -&gt; <a href="#type-option">option</a>(Values::[term()])
+get(Optics, Data) -&gt; <a href="#type-option">option</a>(Values)
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li><li><code>Data = term()</code></li><li><code>Values = [term()]</code></li></ul>
 
 `Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />
 
@@ -393,9 +399,10 @@ Example:
 ### is_optic/1 ###
 
 <pre><code>
-is_optic(Candidate::term()) -&gt; boolean()
+is_optic(Candidate) -&gt; boolean()
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Candidate = term()</code></li></ul>
 
 `Candidate`: The term to test.<br />
 
@@ -408,9 +415,10 @@ Check if a term is an optic.
 ### lax/1 ###
 
 <pre><code>
-lax(Optic::<a href="#type-optic">optic()</a>) -&gt; <a href="#type-optic">optic()</a>
+lax(Optic) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optic = <a href="#type-optic">optic()</a></code></li></ul>
 
 `Optic`: The existing optic to wrap.<br />
 
@@ -425,12 +433,13 @@ optic would otherwise return `{error, undefined}` or
 ### map/3 ###
 
 <pre><code>
-map(Optics::<a href="#type-optics">optics()</a>, Data::term(), Map::<a href="#type-callback_map">callback_map()</a>) -&gt; <a href="#type-option">option</a>(NewData::term())
+map(Optics, Map, Data) -&gt; <a href="#type-option">option</a>(NewData)
 </code></pre>
-<br />
 
-`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`Map`: The callback function to invoke on the focused elements. Expected
-  to return a modified element.<br />
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li><li><code>Map = <a href="#type-callback_map">callback_map()</a></code></li><li><code>Data = term()</code></li><li><code>NewData = term()</code></li></ul>
+
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Map`: The callback function to invoke on the focused elements. Expected
+  to return a modified element.<br />`Data`: The container to apply the optics to.<br />
 
 returns: 
 On success, returns a tuple of ok and the modified container.
@@ -444,13 +453,14 @@ focusing on the given data structure.
 ### mapfold/4 ###
 
 <pre><code>
-mapfold(Optics::<a href="#type-optics">optics()</a>, Data::term(), MapFold::<a href="#type-callback_mapfold">callback_mapfold()</a>, Acc::term()) -&gt; <a href="#type-option">option</a>({NewData::term(), NewAcc::term()})
+mapfold(Optics, MapFold, Acc, Data) -&gt; <a href="#type-option">option</a>({NewData, NewAcc})
 </code></pre>
-<br />
 
-`Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />`MapFold`: The callback function to invoke on the focused elements and
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li><li><code>MapFold = <a href="#type-callback_mapfold">callback_mapfold()</a></code></li><li><code>Acc = term()</code></li><li><code>Data = term()</code></li><li><code>NewData = term()</code></li><li><code>NewAcc = term()</code></li></ul>
+
+`Optics`: A list of optics to apply. Leftmost is applied first.<br />`MapFold`: The callback function to invoke on the focused elements and
   accumulator. Expected to return a tuple of the modified element and
-  accumulator.<br />`Acc`: The initial accumulator value.<br />
+  accumulator.<br />`Acc`: The initial accumulator value.<br />`Data`: The container to apply the optics to.<br />
 
 returns: 
 On success, returns a tuple of ok and a tuple of the modified
@@ -465,9 +475,10 @@ result of focusing on the given data structure.
 ### merge/1 ###
 
 <pre><code>
-merge(Optics::<a href="#type-optics">optics()</a>) -&gt; <a href="#type-optic">optic()</a>
+merge(Optics) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li></ul>
 
 `Optics`: The list of optics to compose.<br />
 
@@ -484,9 +495,10 @@ It is the optic product type.
 ### new/1 ###
 
 <pre><code>
-new(MapFold::<a href="#type-optic_mapfold">optic_mapfold()</a>) -&gt; <a href="#type-optic">optic()</a>
+new(MapFold) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>MapFold = <a href="#type-optic_mapfold">optic_mapfold()</a></code></li></ul>
 
 returns: An opaque optic record.
 
@@ -502,9 +514,10 @@ __See also:__ [new/2](#new-2).
 ### new/2 ###
 
 <pre><code>
-new(MapFold::<a href="#type-optic_mapfold">optic_mapfold()</a>, Fold::<a href="#type-optic_fold">optic_fold()</a>) -&gt; <a href="#type-optic">optic()</a>
+new(MapFold, Fold) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>MapFold = <a href="#type-optic_mapfold">optic_mapfold()</a></code></li><li><code>Fold = <a href="#type-optic_fold">optic_fold()</a></code></li></ul>
 
 `MapFold`: At a minimum, an optic requires a mapfold function to be provided
   for both collecting and modifying values. This function must take
@@ -550,9 +563,10 @@ are applied.
 ### put/3 ###
 
 <pre><code>
-put(Optics::<a href="#type-optics">optics()</a>, Data::term(), Value::term()) -&gt; <a href="#type-option">option</a>(NewData::term())
+put(Optics, Value, Data) -&gt; <a href="#type-option">option</a>(NewData)
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optics = <a href="#type-optics">optics()</a></code></li><li><code>Value = term()</code></li><li><code>Data = term()</code></li><li><code>NewData = term()</code></li></ul>
 
 `Optics`: A list of optics to apply. Leftmost is applied first.<br />`Data`: The container to apply the optics to.<br />
 
@@ -568,9 +582,10 @@ the final optic.
 ### require/1 ###
 
 <pre><code>
-require(Filter::<a href="#type-callback_filter">callback_filter()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+require(Filter) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Filter = <a href="#type-callback_filter">callback_filter()</a></code></li></ul>
 
 `Filter`: The filter function to invoke to determine if the element should be
   focused. Takes the current data as an argument, returns a boolean
@@ -587,19 +602,19 @@ part of the focus.
 Example:
 
 ```
-  > IsOdd = fun (Elem) -> Elem % 2 == 1 end,
-  > optic:get([optic:require(IsOdd)], [1,2,3]).
-  {error, required}
-```
+> IsOdd = fun (Elem) -> Elem % 2 == 1 end,
+> optic:get([optic:require(IsOdd)], [1,2,3]).
+{error, required}`''
 
 <a name="wrap-2"></a>
 
 ### wrap/2 ###
 
 <pre><code>
-wrap(Optic::<a href="#type-optic">optic()</a>, WrapMapFold::<a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a>) -&gt; <a href="#type-optic">optic()</a>
+wrap(Optic, WrapMapFold) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optic = <a href="#type-optic">optic()</a></code></li><li><code>WrapMapFold = <a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a></code></li></ul>
 
 returns: An opaque optic record.
 
@@ -615,9 +630,10 @@ __See also:__ [wrap/3](#wrap-3).
 ### wrap/3 ###
 
 <pre><code>
-wrap(Optic::<a href="#type-optic">optic()</a>, WrapMapFold::<a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a>, WrapFold::<a href="#type-optic_wrap_fold">optic_wrap_fold()</a>) -&gt; <a href="#type-optic">optic()</a>
+wrap(Optic, WrapMapFold, WrapFold) -&gt; <a href="#type-optic">optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Optic = <a href="#type-optic">optic()</a></code></li><li><code>WrapMapFold = <a href="#type-optic_wrap_mapfold">optic_wrap_mapfold()</a></code></li><li><code>WrapFold = <a href="#type-optic_wrap_fold">optic_wrap_fold()</a></code></li></ul>
 
 `Optic`: An existing optic to modify.<br />`WrapMapFold`: A mapping function to apply to the optic's mapfold function.<br />`WrapFold`: A mapping function to apply to the optic's fold function.<br />
 

@@ -40,9 +40,10 @@ __See also:__ [values/1](#values-1).
 ### all/1 ###
 
 <pre><code>
-all(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+all(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 __See also:__ [values/1](#values-1).
 
@@ -51,9 +52,10 @@ __See also:__ [values/1](#values-1).
 ### key/1 ###
 
 <pre><code>
-key(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+key(Key) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Key = term()</code></li></ul>
 
 __See also:__ [key/2](#key-2).
 
@@ -62,9 +64,10 @@ __See also:__ [key/2](#key-2).
 ### key/2 ###
 
 <pre><code>
-key(Key::term(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+key(Key, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Key = term()</code></li><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Key`: The key to focus on.<br />`Options`: Common optic options.<br />
 
@@ -97,9 +100,10 @@ __See also:__ [keys/1](#keys-1).
 ### keys/1 ###
 
 <pre><code>
-keys(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+keys(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 
@@ -131,9 +135,10 @@ __See also:__ [properties/1](#properties-1).
 ### properties/1 ###
 
 <pre><code>
-properties(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+properties(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 
@@ -155,9 +160,10 @@ Example:
 ### property/1 ###
 
 <pre><code>
-property(Key::term()) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+property(Key) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Key = term()</code></li></ul>
 
 __See also:__ [property/2](#property-2).
 
@@ -166,9 +172,10 @@ __See also:__ [property/2](#property-2).
 ### property/2 ###
 
 <pre><code>
-property(Key::term(), Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+property(Key, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Key = term()</code></li><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Key`: The key to focus on.<br />`Options`: Common optic options.<br />
 
@@ -202,9 +209,10 @@ __See also:__ [values/1](#values-1).
 ### values/1 ###
 
 <pre><code>
-values(Options::<a href="optic.md#type-variations">optic:variations()</a>) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
+values(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 </code></pre>
-<br />
+
+<ul class="definitions"><li><code>Options = <a href="optic.md#type-variations">optic:variations()</a></code></li></ul>
 
 `Options`: Common optic options.<br />
 

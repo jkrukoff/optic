@@ -1,11 +1,11 @@
 
 
-# Module optic_maps #
+# Module optic_dict #
 * [Description](#description)
 * [Function Index](#index)
 * [Function Details](#functions)
 
-A set of optics specific to maps.
+A set of optics specific to dicts.
 
 <a name="index"></a>
 
@@ -13,11 +13,11 @@ A set of optics specific to maps.
 
 
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#all-0">all/0</a></td><td></td></tr><tr><td valign="top"><a href="#all-1">all/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-1">association/1</a></td><td></td></tr><tr><td valign="top"><a href="#association-2">association/2</a></td><td>
-Focus on the association for a map key.</td></tr><tr><td valign="top"><a href="#associations-0">associations/0</a></td><td></td></tr><tr><td valign="top"><a href="#associations-1">associations/1</a></td><td>
-Focus on all associations of a map.</td></tr><tr><td valign="top"><a href="#key-1">key/1</a></td><td></td></tr><tr><td valign="top"><a href="#key-2">key/2</a></td><td>
-Focus on the value of a map key.</td></tr><tr><td valign="top"><a href="#keys-0">keys/0</a></td><td></td></tr><tr><td valign="top"><a href="#keys-1">keys/1</a></td><td>
-Focus on all keys of a map.</td></tr><tr><td valign="top"><a href="#values-0">values/0</a></td><td></td></tr><tr><td valign="top"><a href="#values-1">values/1</a></td><td>
-Focus on all values of a map.</td></tr></table>
+Focus on the association for a dict key.</td></tr><tr><td valign="top"><a href="#associations-0">associations/0</a></td><td></td></tr><tr><td valign="top"><a href="#associations-1">associations/1</a></td><td>
+Focus on all associations of a dict.</td></tr><tr><td valign="top"><a href="#key-1">key/1</a></td><td></td></tr><tr><td valign="top"><a href="#key-2">key/2</a></td><td>
+Focus on the value of a dict key.</td></tr><tr><td valign="top"><a href="#keys-0">keys/0</a></td><td></td></tr><tr><td valign="top"><a href="#keys-1">keys/1</a></td><td>
+Focus on all keys of a dict.</td></tr><tr><td valign="top"><a href="#values-0">values/0</a></td><td></td></tr><tr><td valign="top"><a href="#values-1">values/1</a></td><td>
+Focus on all values of a dict.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -73,14 +73,15 @@ association(Key, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 
 returns: An opaque optic record.
 
-Focus on the association for a map key. An association is the tuple
-of a map key and value. If the key is modified, the optic is no
-longer well behaved.
+Focus on the association for a dict key. An association is the
+tuple of a dict key and value. If the key is modified, the optic is
+no longer well behaved.
 
 Example:
 
 ```
-  > optic:get([optic_maps:association(first)], #{first => 1, second => 2}).
+  > optic:get([optic_dict:association(first)],
+              dict:from_list([{first, 1}, {second, 2}])).
   {ok,[{first,1}]}
 ```
 
@@ -109,13 +110,14 @@ associations(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 
 returns: An opaque optic record.
 
-Focus on all associations of a map. An association is a tuple of
+Focus on all associations of a dict. An association is a tuple of
 the key and value for each entry.
 
 Example:
 
 ```
-  > optic:get([optic_maps:associations()], #{first => 1, second => 2}).
+  > optic:get([optic_dict:associations()],
+              dict:from_list([{first, 1}, {second, 2}])).
   {ok,[{first,1},{second,2}]}
 ```
 
@@ -145,12 +147,13 @@ key(Key, Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 
 returns: An opaque optic record.
 
-Focus on the value of a map key.
+Focus on the value of a dict key.
 
 Example:
 
 ```
-  > optic:get([optic_maps:key(first)], #{first => 1, second => 2}).
+  > optic:get([optic_dict:key(first)],
+              dict:from_list([{first, 1}, {second, 2}])).
   {ok,[1]}
 ```
 
@@ -179,12 +182,13 @@ keys(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 
 returns: An opaque optic record.
 
-Focus on all keys of a map.
+Focus on all keys of a dict.
 
 Example:
 
 ```
-  > optic:get([optic_maps:keys()], #{first => 1, second => 2}).
+  > optic:get([optic_dict:keys()],
+              dict:from_list([{first, 1}, {second, 2}])).
   {ok,[first,second]}
 ```
 
@@ -213,12 +217,13 @@ values(Options) -&gt; <a href="optic.md#type-optic">optic:optic()</a>
 
 returns: An opaque optic record.
 
-Focus on all values of a map.
+Focus on all values of a dict.
 
 Example:
 
 ```
-  > optic:get([optic_maps:values()], #{first => 1, second => 2}).
+  > optic:get([optic_dict:values()],
+              dict:from_list([{first, 1}, {second, 2}])).
   {ok,[1,2]}
 ```
 
