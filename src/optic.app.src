@@ -1,7 +1,7 @@
 {application, optic,
  [{pkg_name, "optic"},
   {description, "A library for reading and updating deeply nested data."},
-  {vsn, "2.0.2"},
+  {vsn, "3.0.0"},
   {applications, [kernel,
                   stdlib]},
   {modules, [optic]},

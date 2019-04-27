@@ -37,11 +37,11 @@ wrap_test_() ->
      ?_assertEqual({ok, [atom]},
                    optic:get(Wrapped2, atom)),
      ?_assertEqual({ok, modified},
-                   optic:put(Wrapped2, atom, modified)),
+                   optic:put(Wrapped2, modified, atom)),
      ?_assertEqual({ok, [atom]},
                    optic:get(Wrapped3, atom)),
      ?_assertEqual({ok, modified},
-                   optic:put(Wrapped3, atom, modified))].
+                   optic:put(Wrapped3, modified, atom))].
 
 chain_test_() ->
     [?_assert(optic:is_optic(optic:chain([id(), id(), id()]))),
@@ -56,16 +56,16 @@ chain_test_() ->
                              atom)),
      ?_assertEqual({ok, modified},
                    optic:put(optic:chain([id()]),
-                             atom,
-                             modified)),
+                             modified,
+                             atom)),
      ?_assertEqual({ok, modified},
                    optic:put(optic:chain([id(), id()]),
-                             atom,
-                             modified)),
+                             modified,
+                             atom)),
      ?_assertEqual({ok, modified},
                    optic:put(optic:chain([id(), id(), id()]),
-                             atom,
-                             modified))].
+                             modified,
+                             atom))].
 
 merge_test_() ->
     [?_assert(optic:is_optic(optic:merge([id(), id(), id()]))),
@@ -80,16 +80,16 @@ merge_test_() ->
                              atom)),
      ?_assertEqual({ok, modified},
                    optic:put([optic:merge([id()])],
-                             atom,
-                             modified)),
+                             modified,
+                             atom)),
      ?_assertEqual({ok, modified},
                    optic:put([optic:merge([id(), id()])],
-                             atom,
-                             modified)),
+                             modified,
+                             atom)),
      ?_assertEqual({ok, modified},
                    optic:put([optic:merge([id(), id(), id()])],
-                             atom,
-                             modified))].
+                             modified,
+                             atom))].
 
 is_optic_test_() ->
     [?_assert(optic:is_optic(id())),
@@ -133,9 +133,9 @@ create_test_() ->
      ?_assertEqual({error, required},
                    optic:get(Create, atom)),
      ?_assertEqual({ok, modified},
-                   optic:put(Create, [], modified)),
+                   optic:put(Create, modified, [])),
      ?_assertEqual({ok, modified},
-                   optic:put(Create, atom, modified))].
+                   optic:put(Create, modified, atom))].
 
 lax_test_() ->
     Lax = optic:lax(optic:require(fun erlang:is_list/1)),
@@ -144,16 +144,16 @@ lax_test_() ->
      ?_assertEqual({ok, []},
                    optic:get(Lax, atom)),
      ?_assertEqual({ok, modified},
-                   optic:put(Lax, [], modified)),
+                   optic:put(Lax, modified, [])),
      ?_assertEqual({ok, atom},
-                   optic:put(Lax, atom, modified))].
+                   optic:put(Lax, modified, atom))].
 
 fold_test() ->
     ?assertEqual({ok, 2},
                  optic:fold([id()],
-                            atom,
                             fun (atom, Acc) -> Acc + 1 end,
-                            1)).
+                            1,
+                            atom)).
 
 get_test() ->
     ?assertEqual({ok, [atom]},
@@ -162,21 +162,21 @@ get_test() ->
 mapfold_test() ->
     ?assertEqual({ok, {modified, 2}},
                  optic:mapfold([id()],
-                               atom,
                                fun (atom, Acc) ->
                                        {modified, Acc + 1}
                                end,
-                               1)).
+                               1,
+                               atom)).
 
 map_test() ->
     ?assertEqual({ok, modified},
                  optic:map([id()],
-                           atom,
-                           fun (atom) -> modified end)).
+                           fun (atom) -> modified end,
+                           atom)).
 
 put_test() ->
     ?assertEqual({ok, modified},
-                 optic:put([id()], atom, modified)).
+                 optic:put([id()], modified, atom)).
 
 id_get_test() ->
     ?assertEqual({ok, [atom]},
@@ -184,7 +184,7 @@ id_get_test() ->
 
 id_put_test() ->
     ?assertEqual({ok, new},
-                 optic:put(optic:id(), atom, new)).
+                 optic:put(optic:id(), new, atom)).
 
 error_get_test() ->
     ?assertEqual({error, reason},
@@ -192,7 +192,7 @@ error_get_test() ->
 
 error_put_test() ->
     ?assertEqual({error, reason},
-                 optic:put(optic:error(reason), atom, new)).
+                 optic:put(optic:error(reason), new, atom)).
 
 filter_get_test_() ->
     [?_assertEqual({ok, [atom]},
@@ -202,9 +202,9 @@ filter_get_test_() ->
 
 filter_put_test_() ->
     [?_assertEqual({ok, modified},
-                   optic:put(optic:filter(fun true/1), atom, modified)),
+                   optic:put(optic:filter(fun true/1), modified, atom)),
      ?_assertEqual({ok, atom},
-                   optic:put(optic:filter(fun false/1), atom, modified))].
+                   optic:put(optic:filter(fun false/1), modified, atom))].
 
 require_get_test_() ->
     [?_assertEqual({ok, [atom]},
@@ -214,9 +214,9 @@ require_get_test_() ->
 
 require_put_test_() ->
     [?_assertEqual({ok, modified},
-                   optic:put(optic:require(fun true/1), atom, modified)),
+                   optic:put(optic:require(fun true/1), modified, atom)),
      ?_assertEqual({error, required},
-                   optic:put(optic:require(fun false/1), atom, modified))].
+                   optic:put(optic:require(fun false/1), modified, atom))].
 
 %%%===================================================================
 %%% Internal Functions
