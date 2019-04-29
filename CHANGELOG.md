@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2019-04-28
+### Added
+- The `optic_array` module was added to work with the corresponding
+  container.
+
 ## [3.0.0] - 2019-04-26
 ### Changed
 - The argument order of `optic:map/3`, `optic:fold/4`, `optic:mapfold/4` and
@@ -41,8 +46,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/jkrukoff/llists/compare/v3.0.0...HEAD
-[3.0.0]: https://github.com/jkrukoff/llists/compare/v2.1.0...v3.0.0
-[2.1.0]: https://github.com/jkrukoff/llists/compare/v2.0.0...v2.1.0
-[2.0.0]: https://github.com/jkrukoff/llists/compare/v1.0.0...v2.0.0
-[1.0.0]: https://github.com/jkrukoff/llists/releases/tag/v1.0.0
+[Unreleased]: https://github.com/jkrukoff/optic/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/jkrukoff/optic/compare/v3.0.0...v3.1.0
+[3.0.0]: https://github.com/jkrukoff/optic/compare/v2.1.0...v3.0.0
+[2.1.0]: https://github.com/jkrukoff/optic/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/jkrukoff/optic/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/jkrukoff/optic/releases/tag/v1.0.0

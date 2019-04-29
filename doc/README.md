@@ -2,7 +2,7 @@
 
 Copyright (c) 2019 John Krukoff
 
-__Version:__ 3.0.0
+__Version:__ 3.1.0
 
 __Authors:__ John Krukoff ([`github@cultist.org`](mailto:github@cultist.org)).
 
@@ -286,6 +286,7 @@ CC BY-SA 3.0 [`https://creativecommons.org/licenses/by/3.0/deed.en`](https://cre
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="optic_array.md" class="module">optic_array</a></td></tr>
 <tr><td><a href="optic_dict.md" class="module">optic_dict</a></td></tr>
 <tr><td><a href="optic_gb_sets.md" class="module">optic_gb_sets</a></td></tr>
 <tr><td><a href="optic_gb_trees.md" class="module">optic_gb_trees</a></td></tr>

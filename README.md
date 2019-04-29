@@ -47,6 +47,7 @@ We could then update all pets to a new status by:
 
 <table width="100%" border="0" summary="list of modules">
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic.md" class="module">optic</a></td></tr>
+<tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_array.md" class="module">optic_array</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_dict.md" class="module">optic_dict</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_gb_sets.md" class="module">optic_gb_sets</a></td></tr>
 <tr><td><a href="http://github.com/jkrukoff/optic/blob/master/doc/optic_gb_trees.md" class="module">optic_gb_trees</a></td></tr>
@@ -111,17 +112,17 @@ how they behave. Those options are passed as a map or proplist:
   individual values, the value of the create property is used as a template to
   create the needed default objects. Setting this property causes the optic to
   no longer be well behaved.
-* filter: When given, expects a value as a filter function to determine if
-  the traversed element should be focused or skipped. The filter function should
+* filter: When given, expects a value as a filter function to determine if the
+  traversed element should be focused or skipped. The filter function should
   take a single arbitrary element and return a boolean true/false. If the
   criteria the filter function uses to select an element is modified, the
   filtered optic will no longer be well behaved.
 * require: When given, expects a value as a filter function to determine if
   the traversed element can be focused. If the element can not be focused,
-  `{error, required}` will be returned. The filter function should take a single
-  arbitrary element and return a boolean true/false. If the criteria the filter
-  function uses to select an element is modified, the filtered optic will no
-  longer be well behaved.
+  `{error, required}` will be returned. The filter function should take a
+  single arbitrary element and return a boolean true/false. If the criteria
+  the filter function uses to select an element is modified, the filtered
+  optic will no longer be well behaved.
 
 
 #### Examples ####
